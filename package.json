@@ -1,0 +1,39 @@
+{
+  "name": "promptforge",
+  "productName": "PromptForge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Desktop prompt helper for local ComfyUI image and video models.",
+  "author": "Decevr",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "check": "node scripts/check-engine.js",
+    "smoke": "electron scripts/smoke-ui.js",
+    "pack": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.decevr.promptforge",
+    "productName": "PromptForge",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": ["portable"],
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "PromptForge.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "33.4.11",
+    "electron-builder": "25.1.8"
+  }
+}

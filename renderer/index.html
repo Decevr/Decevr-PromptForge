@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PromptForge</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">Pf</span>
+        <div>
+          <h1>PromptForge</h1>
+          <p>Desktop prompts for local ComfyUI</p>
+        </div>
+      </div>
+      <p class="version" id="version"></p>
+    </header>
+
+    <main>
+      <section class="composer">
+        <form id="form" class="form">
+          <label class="field" for="prompt-input">
+            <span>Word or prompt</span>
+            <textarea id="prompt-input" rows="5" placeholder="eyes&#10;or paste a full prompt" spellcheck="false"></textarea>
+          </label>
+
+          <div class="field">
+            <span id="model-label">Model</span>
+            <div class="combo" id="model-combo">
+              <button type="button" class="combo-button" id="model-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="model-label">
+                <span id="model-button-label">Pick a model</span>
+                <span class="chevron" aria-hidden="true"></span>
+              </button>
+              <div class="combo-panel" id="model-panel" hidden>
+                <input id="model-search" type="text" placeholder="Search models" autocomplete="off" aria-label="Search models" />
+                <div class="combo-list" id="model-list" role="listbox"></div>
+              </div>
+            </div>
+          </div>
+
+          <label class="field" for="format-select">
+            <span>Format</span>
+            <select id="format-select">
+              <option value="auto">Auto from model</option>
+              <option value="danbooru">Danbooru</option>
+              <option value="gelbooru">Gelbooru</option>
+              <option value="natural">Natural language</option>
+            </select>
+          </label>
+          <p class="hint" id="format-hint"></p>
+
+          <div class="toggles">
+            <label class="check"><input id="quality-toggle" type="checkbox" checked /> Add quality tags</label>
+            <label class="check"><input id="negative-toggle" type="checkbox" /> Include negative prompt</label>
+          </div>
+
+          <button type="submit" class="generate" id="generate">Generate</button>
+          <p class="kbd">Ctrl+Enter to generate. Select any prompt text to copy it yourself.</p>
+          <p class="error" id="form-error" hidden></p>
+        </form>
+
+        <div class="history">
+          <div class="history-head">
+            <h2>Favorites</h2>
+            <button type="button" class="text-btn" id="clear-favorites">Clear</button>
+          </div>
+          <div id="favorites-list" class="history-list"></div>
+
+          <div class="history-head">
+            <h2>History</h2>
+            <div class="history-actions">
+              <button type="button" class="text-btn" id="export-text">Export text</button>
+              <button type="button" class="text-btn" id="export-json">Export JSON</button>
+              <button type="button" class="text-btn" id="clear-history">Clear</button>
+            </div>
+          </div>
+          <div id="history-list" class="history-list"></div>
+        </div>
+      </section>
+
+      <section class="results-pane">
+        <div class="results-bar">
+          <div>
+            <h2>Results</h2>
+            <p class="hint" id="results-meta">Type a word like eyes, or paste a prompt.</p>
+          </div>
+          <button type="button" class="copy-all" id="copy-all" hidden>Copy All</button>
+        </div>
+        <div id="results" class="results"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="data/models.js"></script>
+  <script src="data/variations.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
