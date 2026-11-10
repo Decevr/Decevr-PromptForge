@@ -20,13 +20,19 @@ app.whenReady().then(async () => {
   });
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
   const report = await win.webContents.executeJavaScript(`
+    document.getElementById('prompt-input').value = 'beuatiful womna post';
+    document.getElementById('prompt-input').dispatchEvent(new Event('input', { bubbles: true }));
+    const spellMisses = document.querySelectorAll('.spell-layer .miss').length;
+    const spellHint = document.getElementById('spell-hint').textContent;
     document.getElementById('prompt-input').value = 'eyes';
     document.getElementById('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     const text = document.querySelector('[data-prompt="0"]')?.textContent || '';
     const copyButtons = document.querySelectorAll('.copy-btn').length;
     const label = document.getElementById('model-button-label').textContent;
     const settings = document.querySelector('.settings')?.textContent || '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length });
+    const title = document.querySelector('h1')?.textContent || '';
+    const credit = document.querySelector('.credit')?.textContent || '';
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -37,6 +43,12 @@ app.whenReady().then(async () => {
   if (parsed.label !== 'Illustrious – tags') problems.push('model label: ' + parsed.label);
   if (!parsed.settings.includes('CFG')) problems.push('settings missing');
   if (parsed.cards < 5) problems.push('expected variations, got ' + parsed.cards);
+  if (parsed.title !== 'PromptForge') problems.push('wordmark: ' + parsed.title);
+  if (parsed.credit !== 'Decevr Co.') problems.push('credit: ' + parsed.credit);
+  if (parsed.spellMisses !== 2) problems.push('spellcheck marks: ' + parsed.spellMisses);
+  if (!/beuatiful → beautiful/.test(parsed.spellHint)) problems.push('spellcheck hint: ' + parsed.spellHint);
+  if (!/womna → woman/.test(parsed.spellHint)) problems.push('spellcheck hint: ' + parsed.spellHint);
+  if (/post/.test(parsed.spellHint)) problems.push('spellcheck flagged post: ' + parsed.spellHint);
   if (problems.length) {
     console.error(problems.join('\n'));
     app.exit(1);

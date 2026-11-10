@@ -17,6 +17,7 @@ A desktop shortcut named PromptForge points at the same app after the first setu
 
 - Searchable image and video model list, with the daily ComfyUI models first
 - Danbooru, Gelbooru, or natural language, chosen from the model
+- Automatic spelling fixes, then a prompt cleanup: tag order, shorthand, filler, and a light cue when the prompt has none
 - Single-word variations, and paste-to-optimize for a full prompt
 - Quality tags and negative prompt toggles
 - Copy on every prompt, Copy All, and selectable prompt text

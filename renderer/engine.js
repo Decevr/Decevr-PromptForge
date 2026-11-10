@@ -11,6 +11,25 @@
     'are', 'was', 'be', 'as', 'by', 'or', 'very', 'really',
   ]);
 
+  const LIGHT_PHRASES = [
+    'soft natural light',
+    'soft practical lighting',
+    'dramatic side light',
+    'soft window light',
+    'warm low light',
+    'dramatic backlight',
+    'cool rim light',
+    'cinematic lighting',
+    'dramatic lighting',
+    'natural lighting',
+    'soft lighting',
+    'rim lighting',
+    'natural light',
+    'golden hour',
+    'window light',
+    'rim light',
+  ];
+
   const CUES = {
     lighting: {
       'tag-heavy': ['dramatic lighting', 'soft lighting', 'rim lighting'],
@@ -26,27 +45,56 @@
 
   function createEngine(concepts) {
     function generate(opts) {
-      const input = String(opts.input || '').trim();
-      if (!input) return { error: 'Type a word or paste a prompt.' };
+      const original = String(opts.input || '').trim();
+      if (!original) return { error: 'Type a word or paste a prompt.' };
       const model = opts.model;
       if (!model) return { error: 'Pick a model.' };
+      const notes = [];
+      let input = original;
+      if (opts.correctSpelling !== false) {
+        const spelling = getSpelling();
+        if (spelling) {
+          const fixed = spelling.correctText(input);
+          input = fixed.text;
+          fixed.changes.forEach(function (change) { notes.push(change); });
+        }
+      }
       const format = !opts.formatOverride || opts.formatOverride === 'auto'
         ? model.preferredFormat
         : opts.formatOverride;
       const mode = isShort(input) ? 'short' : 'optimize';
+      if (opts.improvePrompt !== false && mode === 'optimize') {
+        const improved = improveLongInput(input, model);
+        input = improved.text;
+        improved.notes.forEach(function (note) { notes.push(note); });
+      }
       let prompts = mode === 'short'
         ? expandShort(input, model, format)
         : optimizeLong(input, model, format);
       if (opts.addQuality) prompts = prompts.map(function (prompt) {
         return applyQuality(prompt, model, format);
       });
+      if (opts.ultraDetailed) {
+        const detailed = prompts.map(function (prompt) {
+          return applyUltra(prompt, model, format);
+        });
+        if (detailed.some(function (prompt, index) { return prompt !== prompts[index]; })) {
+          notes.push('Added ultra detailed');
+        }
+        prompts = detailed;
+      }
       prompts = unique(prompts);
+      if (opts.improvePrompt !== false && mode === 'optimize') {
+        if (prompts[1] && prompts[1] !== prompts[0]) notes.push('Suggestion 2 changes the lighting');
+        if (prompts[2] && prompts[2] !== prompts[0]) notes.push('Suggestion 3 changes the framing');
+      }
       const negative = opts.includeNegative ? (model.negativeTemplate || '') : '';
       return {
         mode: mode,
         format: format,
         prompts: prompts,
         negative: negative,
+        notes: notes,
         settingsLine: settingsLine(model),
         estimates: prompts.map(function (prompt) {
           return estimate(prompt, format, model);
@@ -76,12 +124,180 @@
       }
       return [
         base,
-        addCue(base, format, style, 'lighting'),
-        addCue(base, format, style, 'framing'),
+        replaceOrAddCue(base, format, style, 'lighting'),
+        replaceOrAddCue(base, format, style, 'framing'),
       ];
     }
 
     return { generate: generate };
+  }
+
+  function getSpelling() {
+    if (typeof window !== 'undefined' && window.PF_SPELLING) return window.PF_SPELLING;
+    if (typeof require === 'function') {
+      try {
+        return require('./data/spelling');
+      } catch (error) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  const SHORT_TAGS = {
+    cu: 'close-up',
+    ecu: 'extreme close-up',
+    closeup: 'close-up',
+    'close up': 'close-up',
+    bkg: 'background',
+    bg: 'background',
+    fg: 'foreground',
+    dof: 'depth of field',
+  };
+
+  const TAG_BUCKETS = [
+    { rank: 0, re: /^(?:[1-6](?:girl|girls|boy|boys|woman|women|man|men)|solo|duo|trio)$/i },
+    { rank: 2, re: /\b(?:hair|eyes|eye|skin|face|freckles|lips|ears|ear|nose)\b/i },
+    { rank: 3, re: /\b(?:smile|grin|smirk|blush|expression|looking|tears|crying)\b/i },
+    { rank: 5, re: /\b(?:standing|sitting|pose|posing|walking|running|leaning|kneeling|lying)\b/i },
+    { rank: 6, re: /\b(?:background|indoors|outdoors|city|forest|room|street|beach|sky|night|rain|snow|temple|cafe|ocean|mountain)\b/i },
+    { rank: 7, re: /\b(?:lighting|light|sunlight|moonlight|neon|shadow|backlight|rim)\b/i },
+    { rank: 8, re: /\b(?:close-up|closeup|portrait|wide shot|upper body|full body|from side|from above|from below)\b/i },
+    { rank: 4, re: /\b(?:dress|shirt|skirt|armor|armour|clothes|outfit|kimono|jacket|coat|hat|gloves|boots|shoes|gown)\b/i },
+  ];
+
+  function improveLongInput(input, model) {
+    if (detectFormat(input) === 'tags') return improveTagInput(input, model);
+    return improveProse(input, model);
+  }
+
+  function improveTagInput(input, model) {
+    const notes = [];
+    const tags = splitTags(input).map(function (tag) {
+      let next = tag.replace(/\s+/g, ' ').trim();
+      const count = next.replace(/^([1-6])\s+(girl|girls|boy|boys|woman|women|man|men)$/i, function (_all, number, word) {
+        const compact = number + word.toLowerCase();
+        notes.push(next + ' → ' + compact);
+        return compact;
+      });
+      next = count;
+      const key = next.replace(/_/g, ' ').toLowerCase();
+      if (SHORT_TAGS[key]) {
+        notes.push(next + ' → ' + SHORT_TAGS[key]);
+        next = SHORT_TAGS[key];
+      }
+      return next;
+    }).filter(Boolean);
+
+    const seen = {};
+    const deduped = [];
+    tags.forEach(function (tag) {
+      const key = keyOf(tag);
+      if (seen[key]) return;
+      seen[key] = true;
+      deduped.push(tag);
+    });
+    if (deduped.length !== tags.length) notes.push('Removed duplicate tags');
+
+    const ordered = deduped.map(function (tag, index) {
+      return { tag: tag, index: index, rank: tagRank(tag) };
+    }).sort(function (a, b) {
+      if (a.rank !== b.rank) return a.rank - b.rank;
+      return a.index - b.index;
+    }).map(function (item) { return item.tag; });
+
+    if (ordered.join(' | ') !== deduped.join(' | ')) notes.push('Reordered tags');
+
+    if (!ordered.some(function (tag) { return hasLight(tag); })) {
+      const added = lightCue(model);
+      ordered.push(added);
+      notes.push('Added ' + added);
+    }
+
+    return { text: ordered.join(', '), notes: unique(notes) };
+  }
+
+  function tagRank(tag) {
+    const plain = String(tag || '').replace(/_/g, ' ');
+    for (let i = 0; i < TAG_BUCKETS.length; i++) {
+      if (TAG_BUCKETS[i].re.test(plain)) return TAG_BUCKETS[i].rank;
+    }
+    return 4;
+  }
+
+  function improveProse(input, model) {
+    const notes = [];
+    let text = String(input || '').replace(/\s+/g, ' ').trim();
+    text = text.replace(/^(positive prompt|prompt)\s*:\s*/i, function () {
+      notes.push('Removed the prompt label');
+      return '';
+    }).trim();
+    const withoutFiller = text.replace(/\b(very|really|basically|actually|literally)\b/gi, ' ');
+    if (withoutFiller !== text) {
+      notes.push('Removed filler words');
+      text = withoutFiller;
+    }
+    const withoutDupes = text.replace(/\b([A-Za-z]+)(?:\s+\1\b)+/gi, '$1');
+    if (withoutDupes !== text) {
+      notes.push('Removed repeated words');
+      text = withoutDupes;
+    }
+    text = text.replace(/\s+/g, ' ').trim();
+    text = stripLeadIn(text, notes);
+    const withoutThere = text.replace(/^(?:there is|there are|this is)\s+/i, '');
+    if (withoutThere !== text) {
+      if (notes.indexOf('Started on the subject') < 0) notes.push('Started on the subject');
+      text = withoutThere;
+    }
+    text = stripLeadIn(text, notes);
+    const articles = fixArticles(text);
+    if (articles !== text) {
+      notes.push('Fixed a/an');
+      text = articles;
+    }
+    text = text.replace(/\s+/g, ' ').replace(/\s+,/g, ',').trim();
+    if (!hasLight(text)) {
+      const cue = lightCue(model);
+      text = text.replace(/[.\s]*$/, '') + ', ' + cue;
+      notes.push('Added ' + cue);
+    }
+    if (text && /[a-z]/.test(text.charAt(0))) text = text.charAt(0).toUpperCase() + text.slice(1);
+    return { text: text, notes: unique(notes) };
+  }
+
+  function stripLeadIn(text, notes) {
+    const next = text.replace(/^(?:this is\s+)?(?:a\s+|an\s+)?(?:picture|photo|image|rendering|drawing)\s+of\s+/i, '');
+    if (next !== text && notes.indexOf('Started on the subject') < 0) notes.push('Started on the subject');
+    return next;
+  }
+
+  function lightCue(model) {
+    const style = model && model.variationStyle;
+    if (style === 'cinematic') return 'cinematic lighting';
+    if (style === 'tag-heavy') return 'soft lighting';
+    return 'soft natural light';
+  }
+
+  function hasLight(text) {
+    return /\b(light|lighting|sunlight|moonlight|neon|shadow|backlit|backlight|golden hour|window light|rim light)\b/i.test(text);
+  }
+
+  function fixArticles(text) {
+    return text.replace(/\b(a|an)\s+([A-Za-z]+)/gi, function (full, article, word) {
+      const next = needsAn(word) ? 'an' : 'a';
+      if (article.toLowerCase() === next) return article + ' ' + word;
+      const cased = article.charAt(0) === article.charAt(0).toUpperCase()
+        ? next.charAt(0).toUpperCase() + next.slice(1)
+        : next;
+      return cased + ' ' + word;
+    });
+  }
+
+  function needsAn(word) {
+    const lower = word.toLowerCase();
+    if (/^(hour|honest|honor)/.test(lower)) return true;
+    if (/^(uni|one|use|ufo|euro)/.test(lower)) return false;
+    return /^[aeiou]/.test(lower);
   }
 
   function isShort(input) {
@@ -245,13 +461,77 @@
     return tags.concat(parts).join(', ');
   }
 
+  function replaceOrAddCue(prompt, format, style, kind) {
+    const group = CUES[kind][style] || CUES[kind].descriptive;
+    const present = group.find(function (cue) { return hasPhrase(prompt, cue); });
+    const next = group.find(function (cue) { return cue !== present && !hasPhrase(prompt, cue); });
+    if (!next) return prompt;
+    if (present) {
+      const swapped = swapPhrase(prompt, present, next, format);
+      if (swapped) return swapped;
+    }
+    if (kind === 'lighting') {
+      const existing = LIGHT_PHRASES.find(function (cue) { return hasPhrase(prompt, cue); });
+      if (existing) {
+        const swapped = swapPhrase(prompt, existing, next, format);
+        if (swapped) return swapped;
+      }
+    }
+    return addCue(prompt, format, style, kind);
+  }
+
+  function swapPhrase(prompt, present, next, format) {
+    const pattern = phrasePattern(present);
+    if (!pattern.test(prompt)) return null;
+    const token = format === 'natural' ? next : formatTagToken(next, format);
+    return prompt.replace(pattern, function (_full, lead) {
+      return (lead || '') + token;
+    });
+  }
+
+  function phrasePattern(phrase) {
+    const words = String(phrase).toLowerCase().split(/[\s_]+/).filter(Boolean).map(function (word) {
+      return word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    });
+    return new RegExp('(^|[^A-Za-z0-9])' + words.join('[_ ]+') + '(?![A-Za-z0-9])', 'i');
+  }
+
+  function applyUltra(prompt, model, format) {
+    if (hasPhrase(prompt, 'ultra detailed')) return prompt;
+    const phrase = 'ultra detailed';
+    if (format === 'natural') {
+      const trimmed = String(prompt || '').replace(/\s+$/, '');
+      const punct = /[.!?]$/.test(trimmed) ? trimmed.slice(-1) : '';
+      const body = (punct ? trimmed.slice(0, -1) : trimmed).replace(/[,\s]+$/, '');
+      return body + ', ' + phrase + punct;
+    }
+    const leads = {};
+    (model.qualityTags || []).forEach(function (tag) { leads[keyOf(tag)] = true; });
+    const parts = splitTags(prompt);
+    let index = 0;
+    while (index < parts.length && isLeadTag(parts[index], leads)) index += 1;
+    parts.splice(index, 0, phrase);
+    return parts.join(', ');
+  }
+
+  function isLeadTag(tag, leads) {
+    const key = keyOf(tag);
+    if (leads[key]) return true;
+    return /^(?:score_\d+(?:_up)?|source_[a-z0-9]+|rating_[a-z]+)$/.test(key.replace(/ /g, '_'));
+  }
+
   function addCue(prompt, format, style, kind) {
     const group = CUES[kind][style] || CUES[kind].descriptive;
     const missing = group.find(function (cue) {
       return !hasPhrase(prompt, cue);
     });
     if (!missing) return prompt;
-    if (format === 'natural') return prompt.replace(/[.\s]*$/, '') + ', ' + missing;
+    if (format === 'natural') {
+      const trimmed = String(prompt || '').replace(/\s+$/, '');
+      const punct = /[.!?]$/.test(trimmed) ? trimmed.slice(-1) : '';
+      const body = (punct ? trimmed.slice(0, -1) : trimmed).replace(/[,\s]+$/, '');
+      return body + ', ' + missing + punct;
+    }
     return prompt + ', ' + formatTagToken(missing, format);
   }
 

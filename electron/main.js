@@ -27,7 +27,7 @@ function createWindow() {
     height: 860,
     minWidth: 980,
     minHeight: 680,
-    backgroundColor: '#121418',
+    backgroundColor: '#101114',
     autoHideMenuBar: true,
     title: 'PromptForge',
     show: false,

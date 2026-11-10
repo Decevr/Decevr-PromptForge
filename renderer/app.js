@@ -13,6 +13,8 @@
     version: document.getElementById('version'),
     form: document.getElementById('form'),
     input: document.getElementById('prompt-input'),
+    spellLayer: document.getElementById('spell-layer'),
+    spellHint: document.getElementById('spell-hint'),
     modelButton: document.getElementById('model-button'),
     modelButtonLabel: document.getElementById('model-button-label'),
     modelPanel: document.getElementById('model-panel'),
@@ -20,11 +22,15 @@
     modelList: document.getElementById('model-list'),
     format: document.getElementById('format-select'),
     formatHint: document.getElementById('format-hint'),
+    spell: document.getElementById('spell-toggle'),
+    improve: document.getElementById('improve-toggle'),
     quality: document.getElementById('quality-toggle'),
+    ultra: document.getElementById('ultra-toggle'),
     negative: document.getElementById('negative-toggle'),
     error: document.getElementById('form-error'),
     results: document.getElementById('results'),
     resultsMeta: document.getElementById('results-meta'),
+    notes: document.getElementById('change-notes'),
     copyAll: document.getElementById('copy-all'),
     favorites: document.getElementById('favorites-list'),
     history: document.getElementById('history-list'),
@@ -40,7 +46,10 @@
       ? saved.modelId
       : (models[0] && models[0].id),
     formatOverride: saved.formatOverride || 'auto',
+    correctSpelling: saved.correctSpelling !== false,
+    improvePrompt: saved.improvePrompt !== false,
     addQuality: saved.addQuality !== false,
+    ultraDetailed: saved.ultraDetailed === true,
     includeNegative: typeof saved.includeNegative === 'boolean'
       ? saved.includeNegative
       : Boolean(models[0] && models[0].negativeDefault),
@@ -52,6 +61,7 @@
     settingsLine: '',
     formatUsed: '',
     mode: '',
+    notes: [],
     history: saved.history || [],
     favorites: saved.favorites || [],
     activeHistoryId: null,
@@ -62,7 +72,10 @@
   }
 
   els.format.value = state.formatOverride;
+  els.spell.checked = state.correctSpelling;
+  els.improve.checked = state.improvePrompt;
   els.quality.checked = state.addQuality;
+  els.ultra.checked = state.ultraDetailed;
   els.negative.checked = state.includeNegative;
   renderModelButton();
   renderFormatHint();
@@ -120,8 +133,30 @@
     saveStore();
   });
 
+  els.spell.addEventListener('change', function () {
+    state.correctSpelling = els.spell.checked;
+    saveStore();
+    renderSpellcheck();
+  });
+
+  els.input.addEventListener('input', renderSpellcheck);
+  els.input.addEventListener('scroll', function () {
+    els.spellLayer.scrollTop = els.input.scrollTop;
+    els.spellLayer.scrollLeft = els.input.scrollLeft;
+  });
+
+  els.improve.addEventListener('change', function () {
+    state.improvePrompt = els.improve.checked;
+    saveStore();
+  });
+
   els.quality.addEventListener('change', function () {
     state.addQuality = els.quality.checked;
+    saveStore();
+  });
+
+  els.ultra.addEventListener('change', function () {
+    state.ultraDetailed = els.ultra.checked;
     saveStore();
   });
 
@@ -221,7 +256,10 @@
       input: els.input.value,
       model: model,
       formatOverride: state.formatOverride,
+      correctSpelling: state.correctSpelling,
+      improvePrompt: state.improvePrompt,
       addQuality: state.addQuality,
+      ultraDetailed: state.ultraDetailed,
       includeNegative: state.includeNegative,
     });
     if (output.error) {
@@ -234,6 +272,7 @@
     state.activeHistoryId = batchId;
     state.mode = output.mode;
     state.formatUsed = output.format;
+    state.notes = output.notes || [];
     state.settingsLine = output.settingsLine;
     state.negative = output.negative;
     state.results = output.prompts.map(function (prompt, index) {
@@ -250,7 +289,9 @@
       modelName: model.displayName,
       input: els.input.value.trim(),
       format: output.format,
+      notes: state.notes,
       addQuality: state.addQuality,
+      ultraDetailed: state.ultraDetailed,
       includeNegative: state.includeNegative,
       formatOverride: state.formatOverride,
       settingsLine: output.settingsLine,
@@ -272,14 +313,16 @@
       els.results.innerHTML = '';
       els.copyAll.hidden = true;
       els.resultsMeta.textContent = 'Type a word like eyes, or paste a prompt.';
+      showNotes([]);
       return;
     }
     const formatName = FORMAT_LABEL[state.formatUsed] || state.formatUsed;
-    const modeName = state.mode === 'short' ? 'Variations' : 'Optimized';
+    const modeName = state.mode === 'short' ? 'Variations' : (state.improvePrompt ? 'Improved suggestions' : 'Optimized');
     els.resultsMeta.textContent = modeName + ' · ' + formatName + ' · ' + (model ? model.shortLabel : '');
+    showNotes(state.notes);
     els.copyAll.hidden = false;
     els.results.innerHTML = state.results.map(function (result, index) {
-      const label = state.mode === 'short' ? 'Variation ' + (index + 1) : (index === 0 ? 'Optimized' : 'Alternate ' + index);
+      const label = resultLabel(index);
       const starred = state.favorites.some(function (item) { return item.id === result.id; });
       const estimateClass = result.estimate && result.estimate.warn ? 'estimate warn' : 'estimate';
       const negative = state.negative
@@ -299,6 +342,12 @@
         '<div class="card-actions"><button type="button" class="star' + (starred ? ' starred' : '') + '" data-star="' + index + '">' + (starred ? 'Starred' : 'Star') + '</button></div>' +
         '</article>';
     }).join('');
+  }
+
+  function resultLabel(index) {
+    if (state.mode === 'short') return 'Variation ' + (index + 1);
+    if (!state.improvePrompt) return index === 0 ? 'Optimized' : 'Alternate ' + index;
+    return index === 0 ? 'Improved' : 'Suggestion ' + (index + 1);
   }
 
   function weightButton(index, value) {
@@ -412,12 +461,16 @@
     const batch = state.history.find(function (item) { return item.id === id; });
     if (!batch) return;
     els.input.value = batch.input;
+    renderSpellcheck();
     state.modelId = batch.modelId;
     state.formatOverride = batch.formatOverride || 'auto';
     state.addQuality = batch.addQuality;
+    state.ultraDetailed = Boolean(batch.ultraDetailed);
     state.includeNegative = batch.includeNegative;
+    state.notes = batch.notes || [];
     els.format.value = state.formatOverride;
     els.quality.checked = state.addQuality;
+    els.ultra.checked = state.ultraDetailed;
     els.negative.checked = state.includeNegative;
     state.activeHistoryId = batch.id;
     state.mode = batch.input.includes(',') ? 'optimize' : 'short';
@@ -634,7 +687,10 @@
     const payload = {
       modelId: state.modelId,
       formatOverride: state.formatOverride,
+      correctSpelling: state.correctSpelling,
+      improvePrompt: state.improvePrompt,
       addQuality: state.addQuality,
+      ultraDetailed: state.ultraDetailed,
       includeNegative: state.includeNegative,
       history: state.history,
       favorites: state.favorites,
@@ -650,6 +706,16 @@
     }
   }
 
+  function showNotes(notes) {
+    if (!notes || !notes.length) {
+      els.notes.hidden = true;
+      els.notes.textContent = '';
+      return;
+    }
+    els.notes.hidden = false;
+    els.notes.textContent = notes.join(' · ');
+  }
+
   function formatTime(iso) {
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return '';
@@ -660,6 +726,43 @@
     const value = String(text || '').replace(/\s+/g, ' ').trim();
     if (value.length <= max) return value;
     return value.slice(0, max - 1) + '…';
+  }
+
+  function renderSpellcheck() {
+    const text = els.input.value;
+    if (!state.correctSpelling || !window.PF_SPELLING) {
+      els.spellLayer.innerHTML = '';
+      els.spellHint.textContent = '';
+      return;
+    }
+    const parts = [];
+    const notes = [];
+    const seen = {};
+    const re = /[A-Za-z]+/g;
+    let last = 0;
+    let match;
+    while ((match = re.exec(text))) {
+      const word = match[0];
+      const fixed = window.PF_SPELLING.correctText(word).text;
+      parts.push(escapeHtml(text.slice(last, match.index)));
+      if (fixed !== word) {
+        parts.push('<span class="miss">' + escapeHtml(word) + '</span>');
+        const note = word + ' → ' + fixed;
+        if (!seen[note]) {
+          seen[note] = true;
+          notes.push(note);
+        }
+      } else {
+        parts.push(escapeHtml(word));
+      }
+      last = match.index + word.length;
+    }
+    parts.push(escapeHtml(text.slice(last)));
+    let html = parts.join('');
+    if (text.endsWith('\n')) html += '<br>';
+    els.spellLayer.innerHTML = html;
+    els.spellLayer.scrollTop = els.input.scrollTop;
+    els.spellHint.textContent = notes.length ? 'Spellcheck: ' + notes.join(' · ') : '';
   }
 
   function escapeHtml(text) {
