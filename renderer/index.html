@@ -25,6 +25,10 @@
           <textarea id="prompt-input" rows="3" placeholder="eyes, or paste a full prompt" spellcheck="false"></textarea>
           <div id="spell-layer" class="spell-layer" aria-hidden="true"></div>
         </div>
+        <div class="selected-characters" id="selected-characters">
+          <span class="selected-label">Characters</span>
+          <div id="selected-character-list" class="selected-list"></div>
+        </div>
         <p class="spell-hint" id="spell-hint"></p>
       </label>
 
@@ -60,14 +64,14 @@
       <p class="error" id="form-error" hidden></p>
     </form>
 
+    <div class="tool-bar" id="tool-bar"></div>
+
     <div class="toggles">
       <label class="check"><input id="spell-toggle" type="checkbox" checked /> Fix spelling</label>
       <label class="check"><input id="improve-toggle" type="checkbox" checked /> Improve prompt</label>
       <label class="check"><input id="quality-toggle" type="checkbox" checked /> Quality tags</label>
       <label class="check"><input id="ultra-toggle" type="checkbox" /> Ultra detailed</label>
       <label class="check"><input id="negative-toggle" type="checkbox" /> Negative</label>
-      <p class="hint" id="format-hint"></p>
-      <p class="kbd">Ctrl+Enter generates. Ctrl+Shift+C characters, Ctrl+Shift+A camera, Ctrl+Shift+N negatives.</p>
     </div>
 
     <section class="stage">
@@ -104,7 +108,13 @@
       </div>
     </section>
 
-    <p class="credit">Decevr Co.</p>
+    <footer class="status-bar">
+      <div class="status-notes">
+        <p class="hint" id="format-hint"></p>
+        <p class="kbd">Ctrl+Enter generates. Ctrl+Shift+C characters, Ctrl+Shift+A camera, Ctrl+Shift+N negatives.</p>
+      </div>
+      <p class="credit">Decevr Co.</p>
+    </footer>
     <p class="version" id="version" hidden></p>
   </div>
 

@@ -43,9 +43,13 @@ app.whenReady().then(async () => {
     document.getElementById('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     const negative = document.querySelector('.neg-block')?.textContent || '';
     const tools = ['Characters', 'Camera', 'Negatives', 'More variations'].filter((name) => {
-      return [...document.querySelectorAll('.toggles button')].some((button) => button.textContent === name);
+      return [...document.querySelectorAll('.tool-bar button')].some((button) => button.textContent === name);
     });
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, negative, tools });
+    const selectedText = document.getElementById('selected-character-list')?.textContent || '';
+    const angleCount = document.querySelectorAll('#angle-list button').length;
+    const lensCount = document.querySelectorAll('#lens-list button').length;
+    const hintMoved = !document.querySelector('.toggles #format-hint') && !!document.querySelector('.status-bar #format-hint');
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, negative, tools, selectedText, angleCount, lensCount, hintMoved });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -65,6 +69,10 @@ app.whenReady().then(async () => {
   if (!parsed.charOpen || !parsed.charClosed) problems.push('character modal did not open and close');
   if (!/extra people/.test(parsed.negative)) problems.push('custom negative missing: ' + parsed.negative);
   if (parsed.tools.length !== 4) problems.push('tool buttons: ' + parsed.tools.join(', '));
+  if (parsed.selectedText !== 'No characters selected') problems.push('selected characters: ' + parsed.selectedText);
+  if (parsed.angleCount < 30) problems.push('angle count: ' + parsed.angleCount);
+  if (parsed.lensCount < 25) problems.push('lens count: ' + parsed.lensCount);
+  if (!parsed.hintMoved) problems.push('format hint still in the toggle row');
   if (problems.length) {
     console.error(problems.join('\n'));
     app.exit(1);

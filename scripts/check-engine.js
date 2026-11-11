@@ -239,6 +239,40 @@ assert(more.prompts[0] !== eyes.prompts[0], 'another variation set changes the f
 assert(/golden hour|cool rim light|studio lighting|moonlight|neon/i.test(more.prompts.join(' ')), 'another set adds a new light cue');
 assert(more.notes.some((note) => /Variation set 2/.test(note)), 'variation set is noted');
 
+const forest = engine.generate({
+  input: 'a woman standing in the forest at night',
+  model: flux,
+  formatOverride: 'auto',
+  addQuality: false,
+  includeNegative: false,
+});
+assert(forest.ultraIndex > 0, 'full prompt has an ultra variation index');
+assert(/moonlight through the trees/i.test(forest.prompts[forest.ultraIndex]), 'ultra variation adds moonlight');
+assert(/wet leaves/i.test(forest.prompts[forest.ultraIndex]), 'ultra variation adds wet leaves');
+assert(/mist/i.test(forest.prompts[forest.ultraIndex]), 'ultra variation adds mist');
+assert(!/wet leaves/i.test(forest.prompts[0]), 'the cleaned prompt stays without the extra details');
+assert(forest.notes.some((note) => /Ultra variation adds/.test(note)), 'added details are noted');
+assert(!/\b(girl|man|boy|another woman|2girls)\b/i.test(forest.prompts[forest.ultraIndex].replace(/woman/gi, '')), 'ultra variation does not add a person');
+
+const dryForest = engine.generate({
+  input: 'a woman standing in the dry forest at night',
+  model: flux,
+  formatOverride: 'auto',
+  addQuality: false,
+  includeNegative: false,
+});
+assert(!/wet leaves/i.test(dryForest.prompts[dryForest.ultraIndex]), 'dry scene does not gain wet leaves');
+
+const tagForest = engine.generate({
+  input: '1girl, standing, forest, night',
+  model: illus,
+  formatOverride: 'auto',
+  addQuality: true,
+  includeNegative: false,
+});
+assert(/moonlight_through_the_trees/.test(tagForest.prompts[tagForest.ultraIndex]), 'tag ultra variation uses underscores');
+assert(tagForest.prompts[0].startsWith('masterpiece'), 'quality tags still lead the cleaned card');
+
 if (failed) {
   console.error(failed + ' check(s) failed');
   process.exit(1);

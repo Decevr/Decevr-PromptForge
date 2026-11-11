@@ -19,8 +19,9 @@ A desktop shortcut named PromptForge points at the same app after the first setu
 - Danbooru, Gelbooru, or natural language, chosen from the model
 - Automatic spelling fixes, then a prompt cleanup: tag order, shorthand, filler, and a light cue when the prompt has none
 - Single-word variations, and paste-to-optimize for a full prompt
+- Ultra variation: on a full prompt, an extra card keeps the scene and adds a few implied details
 - Quality tags and negative prompt toggles
-- Character templates: save a description (hair, eyes, face, makeup, nails, skin, body, breasts, ass, vagina, penis, clothing, style) and insert it in the current format
+- Character templates: save a description (age, gender, race, hair, eyes, face, makeup, nails, skin, body, breasts, ass, vagina, penis, clothing, style) and insert it in the current format
 - Camera angles and lenses: insert the angle or lens in natural language or tags
 - Negative builder: category checkboxes, custom tags, and saved presets, merged into the model negative
 - More variations: another set from the same prompt, with a different light and framing

@@ -141,15 +141,15 @@
       if (event.target === modal) modal.hidden = true;
     });
 
-    const toggles = document.querySelector('.toggles');
-    if (toggles) {
+    const toolBar = document.getElementById('tool-bar');
+    if (toolBar) {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'text-btn';
+      button.className = 'tool-btn';
       button.id = 'negatives-open';
       button.textContent = 'Negatives';
       button.addEventListener('click', open);
-      toggles.appendChild(button);
+      toolBar.appendChild(button);
     }
 
     function open() {

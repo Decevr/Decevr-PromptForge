@@ -1,10 +1,10 @@
 (function () {
   function init() {
-    const toggles = document.querySelector('.toggles');
-    if (!toggles) return;
+    const toolBar = document.getElementById('tool-bar');
+    if (!toolBar) return;
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'text-btn';
+    button.className = 'tool-btn';
     button.id = 'more-variations';
     button.textContent = 'More variations';
     button.title = 'Generate another set from the same prompt';
@@ -13,7 +13,7 @@
       if (!input || !input.value.trim()) return;
       document.dispatchEvent(new CustomEvent('promptforge:more-variations'));
     });
-    toggles.appendChild(button);
+    toolBar.appendChild(button);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

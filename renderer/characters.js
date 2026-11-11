@@ -2,6 +2,9 @@
   const STORAGE_KEY = 'promptforge.characters.v1';
   const FIELDS = [
     { key: 'name', label: 'Name', required: true },
+    { key: 'age', label: 'Age' },
+    { key: 'gender', label: 'Gender' },
+    { key: 'race', label: 'Race' },
     { key: 'hair', label: 'Hair' },
     { key: 'eyes', label: 'Eyes' },
     { key: 'face', label: 'Face / Features' },
@@ -86,8 +89,10 @@
       '<form class="character-form" id="character-form">',
       '<h3 id="char-form-title">New character</h3>',
       FIELDS.map(function (field) {
-        return '<label><span>' + field.label + (field.required ? ' *' : '') + '</span><input name="' + field.key + '" type="text"' + (field.required ? ' required' : '') + ' /></label>';
+        const placeholder = field.key === 'age' ? ' placeholder="25"' : '';
+        return '<label><span>' + field.label + (field.required ? ' *' : '') + '</span><input name="' + field.key + '" type="text"' + placeholder + (field.required ? ' required' : '') + ' /></label>';
       }).join(''),
+      '<p class="hint" id="char-age-note" hidden></p>',
       '<div class="character-actions"><button type="submit" class="generate">Save character</button>',
       '<button type="button" class="text-btn" id="char-new">New</button></div>',
       '</form></div></div>',
@@ -102,6 +107,38 @@
     const form = document.getElementById('character-form');
     const title = document.getElementById('char-form-title');
     let editingId = null;
+    const selected = [];
+
+    function renderSelected() {
+      const host = document.getElementById('selected-character-list');
+      if (!host) return;
+      if (!selected.length) {
+        host.innerHTML = '<span class="selected-empty">No characters selected</span>';
+        return;
+      }
+      host.innerHTML = selected.map(function (item) {
+        return '<button type="button" class="char-chip" data-remove-char="' + escapeHtml(item.id) + '">' + escapeHtml(item.name) + '<span aria-hidden="true">×</span></button>';
+      }).join('');
+    }
+
+    function removeSelected(id) {
+      const index = selected.findIndex(function (item) { return item.id === id; });
+      if (index < 0) return;
+      const item = selected[index];
+      const input = document.getElementById('prompt-input');
+      if (input && item.snippet) {
+        const snippet = item.snippet.replace(/[.\s]*$/, '');
+        const at = input.value.indexOf(snippet);
+        if (at >= 0) {
+          let next = input.value.slice(0, at) + input.value.slice(at + snippet.length);
+          next = next.replace(/^,\s*/, '').replace(/,\s*,/g, ', ').replace(/\s+,/g, ',').trim();
+          input.value = next;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+      selected.splice(index, 1);
+      renderSelected();
+    }
 
     function renderList() {
       const chars = load();
@@ -120,6 +157,8 @@
       });
       title.textContent = char ? 'Edit character' : 'New character';
       editingId = char ? char.id : null;
+      const ageNote = document.getElementById('char-age-note');
+      if (ageNote) ageNote.hidden = true;
     }
 
     function insertCharacter(char) {
@@ -127,9 +166,15 @@
       if (!input) return;
       const desc = buildDescription(char, activeFormat());
       if (!desc) return;
-      const current = input.value.trim();
-      input.value = current ? desc.replace(/[.\s]*$/, '') + ', ' + current : desc;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const already = selected.some(function (item) { return item.id === char.id; });
+      if (!already) {
+        const current = input.value.trim();
+        const snippet = desc.replace(/[.\s]*$/, '');
+        input.value = current ? snippet + ', ' + current : desc;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        selected.push({ id: char.id, name: char.name, snippet: snippet });
+        renderSelected();
+      }
       input.focus();
     }
 
@@ -148,6 +193,7 @@
         if (!confirm('Delete this character?')) return;
         const id = deleteBtn.getAttribute('data-delete');
         save(chars.filter(function (item) { return item.id !== id; }));
+        removeSelected(id);
         renderList();
         if (editingId === id) fillForm(null);
       }
@@ -161,6 +207,14 @@
         data[field.key] = form.elements[field.key].value.trim();
       });
       if (!data.name) return;
+      const ageNote = document.getElementById('char-age-note');
+      const ages = String(data.age || '').match(/\d+/g) || [];
+      if (ages.some(function (value) { return Number(value) < 21; })) {
+        ageNote.hidden = false;
+        ageNote.textContent = 'Age needs to be 21 or older.';
+        return;
+      }
+      ageNote.hidden = true;
       const chars = load();
       if (editingId) {
         const index = chars.findIndex(function (item) { return item.id === editingId; });
@@ -180,15 +234,15 @@
       if (event.target === modal) modal.hidden = true;
     });
 
-    const toggles = document.querySelector('.toggles');
-    if (toggles) {
+    const toolBar = document.getElementById('tool-bar');
+    if (toolBar) {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'text-btn';
+      button.className = 'tool-btn';
       button.id = 'characters-open';
       button.textContent = 'Characters';
       button.addEventListener('click', open);
-      toggles.appendChild(button);
+      toolBar.appendChild(button);
     }
 
     function open() {
@@ -196,9 +250,19 @@
       modal.hidden = false;
     }
 
+    const selectedHost = document.getElementById('selected-character-list');
+    if (selectedHost) {
+      selectedHost.addEventListener('click', function (event) {
+        const chip = event.target.closest('[data-remove-char]');
+        if (!chip) return;
+        removeSelected(chip.getAttribute('data-remove-char'));
+      });
+    }
+
     window.PromptForgeUI = window.PromptForgeUI || {};
     window.PromptForgeUI.openCharacters = open;
     renderList();
+    renderSelected();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

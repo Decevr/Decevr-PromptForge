@@ -65,6 +65,7 @@
     formatUsed: '',
     mode: '',
     notes: [],
+    ultraIndex: -1,
     history: saved.history || [],
     favorites: saved.favorites || [],
     activeHistoryId: null,
@@ -317,6 +318,7 @@
     state.mode = output.mode;
     state.formatUsed = output.format;
     state.notes = output.notes || [];
+    state.ultraIndex = typeof output.ultraIndex === 'number' ? output.ultraIndex : -1;
     state.settingsLine = output.settingsLine;
     state.negative = output.negative;
     state.results = output.prompts.map(function (prompt, index) {
@@ -334,6 +336,7 @@
       input: els.input.value.trim(),
       format: output.format,
       notes: state.notes,
+      ultraIndex: state.ultraIndex,
       addQuality: state.addQuality,
       ultraDetailed: state.ultraDetailed,
       includeNegative: state.includeNegative,
@@ -389,6 +392,7 @@
   }
 
   function resultLabel(index) {
+    if (index === state.ultraIndex) return 'Ultra variation';
     if (state.mode === 'short') return 'Variation ' + (index + 1);
     if (!state.improvePrompt) return index === 0 ? 'Optimized' : 'Alternate ' + index;
     return index === 0 ? 'Improved' : 'Suggestion ' + (index + 1);
@@ -526,6 +530,7 @@
     state.ultraDetailed = Boolean(batch.ultraDetailed);
     state.includeNegative = batch.includeNegative;
     state.notes = batch.notes || [];
+    state.ultraIndex = typeof batch.ultraIndex === 'number' ? batch.ultraIndex : -1;
     els.format.value = state.formatOverride;
     els.quality.checked = state.addQuality;
     els.ultra.checked = state.ultraDetailed;

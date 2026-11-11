@@ -72,6 +72,15 @@
       let prompts = mode === 'short'
         ? expandShort(input, model, format, variationOffset)
         : optimizeLong(input, model, format, variationOffset);
+      let ultraAdded = [];
+      if (mode === 'optimize' && prompts[0]) {
+        const ultra = makeUltraVariation(prompts[0], format);
+        if (ultra) {
+          prompts.push(ultra.prompt);
+          ultraAdded = ultra.added;
+          notes.push('Ultra variation adds ' + ultra.added.join(', '));
+        }
+      }
       if (opts.addQuality) prompts = prompts.map(function (prompt) {
         return applyQuality(prompt, model, format);
       });
@@ -85,6 +94,12 @@
         prompts = detailed;
       }
       prompts = unique(prompts);
+      let ultraIndex = -1;
+      if (ultraAdded.length) {
+        prompts.forEach(function (prompt, index) {
+          if (ultraAdded.every(function (detail) { return hasPhrase(prompt, detail); })) ultraIndex = index;
+        });
+      }
       if (opts.improvePrompt !== false && mode === 'optimize') {
         if (prompts[1] && prompts[1] !== prompts[0]) notes.push('Suggestion 2 changes the lighting');
         if (prompts[2] && prompts[2] !== prompts[0]) notes.push('Suggestion 3 changes the framing');
@@ -98,6 +113,7 @@
         mode: mode,
         format: format,
         prompts: prompts,
+        ultraIndex: ultraIndex,
         negative: negative,
         notes: notes,
         settingsLine: settingsLine(model),
@@ -467,6 +483,158 @@
       return !kill[keyOf(part)];
     });
     return tags.concat(parts).join(', ');
+  }
+
+  const ULTRA_RULES = [
+    {
+      match: function (hay) { return /\b(forest|woods|jungle|grove)\b/.test(hay) && /\b(night|midnight)\b/.test(hay); },
+      details: [
+        { text: 'moonlight through the trees', unless: /\b(sunlight|daylight|golden hour|noon|neon)\b/ },
+        { text: 'wet leaves', unless: /\bdry\b/ },
+        { text: 'mist', unless: /\b(mist|fog)\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(forest|woods|jungle|grove)\b/.test(hay) && /\b(day|sunny|morning|noon|sunlight)\b/.test(hay); },
+      details: [
+        { text: 'dappled sunlight', unless: /\b(night|moonlight|neon)\b/ },
+        { text: 'soft undergrowth', unless: /\bundergrowth\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(forest|woods|jungle|grove)\b/.test(hay) && !/\b(night|midnight|day|sunny|noon)\b/.test(hay); },
+      details: [
+        { text: 'tall trees', unless: /\btrees\b/ },
+        { text: 'forest floor', unless: /\bforest floor\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(city|street|alley)\b/.test(hay) && /\b(rain|raining|rainy)\b/.test(hay); },
+      details: [
+        { text: 'wet pavement', unless: /\b(dry|wet pavement)\b/ },
+        { text: 'reflections', unless: /\breflection/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(city|street|alley)\b/.test(hay) && /\b(night|midnight)\b/.test(hay); },
+      details: [
+        { text: 'neon reflections', unless: /\bneon\b/ },
+        { text: 'distant windows', unless: /\bwindows\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(rain|raining|rainy)\b/.test(hay); },
+      details: [
+        { text: 'wet surfaces', unless: /\b(dry|wet)\b/ },
+        { text: 'droplets', unless: /\b(droplet|drop of rain)\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(night|midnight)\b/.test(hay) && !/\b(sunlight|daylight|noon)\b/.test(hay); },
+      details: [
+        { text: 'moonlight', unless: /\b(moonlight|sunlight|neon)\b/ },
+        { text: 'deep shadows', unless: /\bshadow/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(portrait|close-up|close up|smile)\b/.test(hay); },
+      details: [
+        { text: 'shallow depth of field', unless: /\bdepth of field\b/ },
+        { text: 'soft background', unless: /\bbackground\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(ballroom|gown|ball gown)\b/.test(hay); },
+      details: [
+        { text: 'warm light', unless: /\b(neon|moonlight)\b/ },
+        { text: 'polished floor', unless: /\bfloor\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(beach|ocean|sea|shore)\b/.test(hay); },
+      details: [
+        { text: 'soft horizon', unless: /\bhorizon\b/ },
+        { text: 'sea breeze', unless: /\bbreeze\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(snow|snowy)\b/.test(hay); },
+      details: [
+        { text: 'falling snow', unless: /\bfalling snow\b/ },
+        { text: 'cold air', unless: /\bcold\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(sunset|sunrise|golden hour)\b/.test(hay); },
+      details: [
+        { text: 'long shadows', unless: /\bshadow/ },
+        { text: 'warm sky', unless: /\bsky\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(cafe|kitchen|bedroom|indoors|indoor)\b/.test(hay); },
+      details: [
+        { text: 'ambient interior light', unless: /\b(moonlight|sunlight|neon)\b/ },
+        { text: 'quiet room', unless: /\bquiet\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(mountain|mountains)\b/.test(hay); },
+      details: [
+        { text: 'distant peaks', unless: /\bpeaks\b/ },
+        { text: 'clear air', unless: /\bclear air\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\b(temple|shrine)\b/.test(hay); },
+      details: [
+        { text: 'lantern light', unless: /\blantern\b/ },
+        { text: 'quiet atmosphere', unless: /\bquiet\b/ },
+      ],
+    },
+    {
+      match: function (hay) { return /\bdesert\b/.test(hay); },
+      details: [
+        { text: 'warm haze', unless: /\bhaze\b/ },
+        { text: 'long shadows', unless: /\bshadow/ },
+      ],
+    },
+  ];
+
+  function makeUltraVariation(prompt, format) {
+    const hay = prompt.toLowerCase().replace(/_/g, ' ');
+    const added = [];
+    ULTRA_RULES.forEach(function (rule) {
+      if (added.length >= 4 || !rule.match(hay)) return;
+      rule.details.forEach(function (detail) {
+        if (added.length >= 4) return;
+        if (detail.unless && detail.unless.test(hay)) return;
+        if (hasPhrase(prompt, detail.text)) return;
+        if (added.some(function (item) { return item.indexOf(detail.text) >= 0 || detail.text.indexOf(item) >= 0; })) return;
+        added.push(detail.text);
+      });
+    });
+    if (!added.length) {
+      [{ text: 'rich surface detail', unless: /\bsurface detail\b/ }, { text: 'cohesive atmosphere', unless: /\batmosphere\b/ }].forEach(function (detail) {
+        if (added.length >= 2) return;
+        if (detail.unless.test(hay) || hasPhrase(prompt, detail.text)) return;
+        added.push(detail.text);
+      });
+    }
+    if (!added.length) return null;
+    return { prompt: appendDetails(prompt, format, added), added: added };
+  }
+
+  function appendDetails(prompt, format, details) {
+    if (format === 'natural') {
+      const trimmed = String(prompt || '').replace(/\s+$/, '');
+      const punct = /[.!?]$/.test(trimmed) ? trimmed.slice(-1) : '';
+      const body = (punct ? trimmed.slice(0, -1) : trimmed).replace(/[,\s]+$/, '');
+      return body + ', ' + details.join(', ') + (punct || '.');
+    }
+    return prompt + ', ' + details.map(function (detail) {
+      return formatTagToken(detail, format);
+    }).join(', ');
   }
 
   function mergeNegative(template, extra) {

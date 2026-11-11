@@ -16,6 +16,25 @@
     { label: 'Dutch angle', natural: 'dutch angle', tag: 'dutch angle' },
     { label: 'Profile', natural: 'profile view', tag: 'profile' },
     { label: 'Three-quarter', natural: 'three-quarter view', tag: 'three-quarter view' },
+    { label: 'Cowboy shot', natural: 'cowboy shot, mid thigh up', tag: 'cowboy shot' },
+    { label: 'Bust', natural: 'bust shot', tag: 'bust' },
+    { label: 'From behind', natural: 'shot from behind', tag: 'from behind' },
+    { label: 'Rear three-quarter', natural: 'rear three-quarter view', tag: 'rear three-quarter view' },
+    { label: 'Eye level', natural: 'eye level shot', tag: 'eye level' },
+    { label: 'Bird\'s eye', natural: 'bird\'s eye view', tag: 'bird\'s eye view' },
+    { label: 'Worm\'s eye', natural: 'worm\'s eye view', tag: 'worm\'s eye view' },
+    { label: 'Ground level', natural: 'ground level shot', tag: 'ground level' },
+    { label: 'Shoulder level', natural: 'shoulder level shot', tag: 'shoulder level' },
+    { label: 'Hip level', natural: 'hip level shot', tag: 'hip level' },
+    { label: 'Establishing', natural: 'establishing shot', tag: 'establishing shot' },
+    { label: 'Insert detail', natural: 'insert detail shot', tag: 'insert detail' },
+    { label: 'Through foreground', natural: 'shot through foreground', tag: 'through foreground' },
+    { label: 'Centered', natural: 'centered composition', tag: 'centered' },
+    { label: 'Off center', natural: 'off center composition', tag: 'off center' },
+    { label: 'Two-shot', natural: 'two shot', tag: 'two shot' },
+    { label: 'Looking back', natural: 'looking back over the shoulder', tag: 'looking back' },
+    { label: 'Crane', natural: 'crane shot', tag: 'crane shot' },
+    { label: 'Dolly in', natural: 'dolly in', tag: 'dolly in' },
   ];
 
   const LENSES = [
@@ -29,6 +48,26 @@
     { label: 'Shallow DOF', natural: 'shallow depth of field, bokeh', tag: 'shallow depth of field, bokeh' },
     { label: 'Deep focus', natural: 'deep focus, everything sharp', tag: 'deep focus' },
     { label: 'Cinematic anamorphic', natural: 'anamorphic lens, cinematic', tag: 'anamorphic, cinematic' },
+    { label: '14mm ultra wide', natural: '14mm lens, ultra wide', tag: '14mm, ultra wide' },
+    { label: '20mm', natural: '20mm lens', tag: '20mm' },
+    { label: '28mm', natural: '28mm lens', tag: '28mm' },
+    { label: '40mm', natural: '40mm lens', tag: '40mm' },
+    { label: '70mm', natural: '70mm lens', tag: '70mm' },
+    { label: '100mm', natural: '100mm lens', tag: '100mm' },
+    { label: '200mm telephoto', natural: '200mm lens, telephoto compression', tag: '200mm, telephoto' },
+    { label: 'Tilt-shift', natural: 'tilt-shift lens', tag: 'tilt-shift' },
+    { label: 'Soft focus', natural: 'soft focus lens', tag: 'soft focus' },
+    { label: 'Swirly bokeh', natural: 'swirly bokeh lens', tag: 'swirly bokeh' },
+    { label: 'Vintage glass', natural: 'vintage lens, soft highlights', tag: 'vintage lens' },
+    { label: 'Fast f/1.4', natural: 'f/1.4, very shallow depth of field', tag: 'f/1.4, shallow depth of field' },
+    { label: 'f/8 sharp', natural: 'f/8, stopped down, sharp across the frame', tag: 'f/8, deep focus' },
+    { label: 'Probe', natural: 'probe lens, extreme close detail', tag: 'probe lens' },
+    { label: 'Split diopter', natural: 'split diopter, near and far in focus', tag: 'split diopter' },
+    { label: 'Medium format', natural: 'medium format lens, smooth tones', tag: 'medium format' },
+    { label: '35mm anamorphic', natural: '35mm anamorphic lens', tag: '35mm, anamorphic' },
+    { label: '50mm anamorphic', natural: '50mm anamorphic lens', tag: '50mm, anamorphic' },
+    { label: 'Spherical prime', natural: 'spherical prime lens', tag: 'spherical prime' },
+    { label: 'Drone wide', natural: 'drone wide lens, aerial', tag: 'drone, wide angle' },
   ];
 
   function activeFormat() {
@@ -110,15 +149,15 @@
 
     document.getElementById('camera-close').addEventListener('click', function () { modal.hidden = true; });
 
-    const toggles = document.querySelector('.toggles');
-    if (toggles) {
+    const toolBar = document.getElementById('tool-bar');
+    if (toolBar) {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'text-btn';
+      button.className = 'tool-btn';
       button.id = 'camera-open';
       button.textContent = 'Camera';
       button.addEventListener('click', open);
-      toggles.appendChild(button);
+      toolBar.appendChild(button);
     }
 
     function open() { modal.hidden = false; }
