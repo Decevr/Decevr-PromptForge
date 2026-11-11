@@ -1,5 +1,26 @@
 (function () {
   const STORAGE_KEY = 'promptforge.extras.v1';
+
+  function sexName(name) {
+    return name ? name + ', ' : '';
+  }
+
+  function maleVaginal(pose, name) {
+    return pose + ', an adult male partner fucking her, his penis inside her vagina, ' + sexName(name) + 'vaginal penetration visible, only his face out of frame or obscured';
+  }
+
+  function maleAnal(pose, name) {
+    return pose + ', an adult male partner fucking her ass, his penis inside her ass, ' + sexName(name) + 'anal penetration visible, only his face out of frame or obscured';
+  }
+
+  function femaleVaginal(pose, name) {
+    return pose + ', an adult female partner fucking her with a strap-on, the strap-on penis inside her vagina, ' + sexName(name) + 'vaginal penetration visible';
+  }
+
+  function femaleAnal(pose, name) {
+    return pose + ', an adult female partner fucking her ass with a strap-on, the strap-on penis inside her ass, ' + sexName(name) + 'anal penetration visible';
+  }
+
   const MENUS = [
     {
       id: 'hair',
@@ -449,105 +470,105 @@
       label: 'Sex scene',
       keys: ['sex', 'fucking', 'intercourse', 'missionary', 'cowgirl', 'doggy', 'doggystyle', 'oral', 'blowjob', 'handjob', 'penetration', 'vaginal', 'anal', 'spooning', 'fingering', 'scissoring', 'grinding', 'sixty-nine', 'mating', 'nelson', 'wheelbarrow', 'facesitting', 'piledriver', 'lotus', 'strap-on', 'strapon', 'leapfrog', 'pretzel', 'amazon', 'paizuri', 'suspended'],
       options: [
-        ['Missionary (Male)', 'an adult woman lying on her back, an adult male partner fucking her in missionary, his face out of frame or obscured'],
-        ['Missionary (Female)', 'an adult woman lying on her back, an adult female partner fucking her with a strap-on in missionary'],
-        ['Mating press (Male)', 'an adult woman folded back, an adult male partner fucking her in a mating press, his face out of frame or obscured'],
-        ['Mating press (Female)', 'an adult woman folded back, an adult female partner fucking her with a strap-on in a mating press'],
-        ['Legs up (Male)', 'an adult woman on her back with her legs up, an adult male partner fucking her, his face out of frame or obscured'],
-        ['Legs up (Female)', 'an adult woman on her back with her legs up, an adult female partner fucking her with a strap-on'],
-        ['Legs over shoulders (Male)', 'an adult woman on her back with her legs over his shoulders, an adult male partner fucking her, his face out of frame or obscured'],
-        ['Legs over shoulders (Female)', 'an adult woman on her back with her legs over the shoulders of an adult female partner, that partner fucking her with a strap-on'],
-        ['From behind (Male)', 'an adult woman, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['From behind (Female)', 'an adult woman, an adult female partner fucking her from behind with a strap-on'],
-        ['Doggystyle (Male)', 'an adult woman on her hands and knees, an adult male partner fucking her from behind, doggystyle, his face out of frame or obscured'],
-        ['Doggystyle (Female)', 'an adult woman on her hands and knees, an adult female partner fucking her from behind with a strap-on, doggystyle'],
-        ['Doggystyle, chest down (Male)', 'an adult woman face down and ass up, an adult male partner fucking her from behind, doggystyle, his face out of frame or obscured'],
-        ['Doggystyle, chest down (Female)', 'an adult woman face down and ass up, an adult female partner fucking her from behind with a strap-on, doggystyle'],
-        ['Standing doggystyle (Male)', 'an adult woman standing and bent forward, an adult male partner fucking her from behind, doggystyle, his face out of frame or obscured'],
-        ['Standing doggystyle (Female)', 'an adult woman standing and bent forward, an adult female partner fucking her from behind with a strap-on, doggystyle'],
-        ['Anal doggystyle (Male)', 'an adult woman on her hands and knees, an adult male partner fucking her ass, doggystyle, his face out of frame or obscured'],
-        ['Anal doggystyle (Female)', 'an adult woman on her hands and knees, an adult female partner fucking her ass with a strap-on, doggystyle'],
-        ['Bent over (Male)', 'an adult woman bent over, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Bent over (Female)', 'an adult woman bent over, an adult female partner fucking her from behind with a strap-on'],
-        ['Bent over a table (Male)', 'an adult woman bent over a table, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Bent over a table (Female)', 'an adult woman bent over a table, an adult female partner fucking her from behind with a strap-on'],
-        ['Bent over the bed (Male)', 'an adult woman bent over the bed, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Bent over the bed (Female)', 'an adult woman bent over the bed, an adult female partner fucking her from behind with a strap-on'],
-        ['On hands and knees (Male)', 'an adult woman on her hands and knees, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['On hands and knees (Female)', 'an adult woman on her hands and knees, an adult female partner fucking her from behind with a strap-on'],
-        ['Leapfrog (Male)', 'an adult woman in a leapfrog, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Leapfrog (Female)', 'an adult woman in a leapfrog, an adult female partner fucking her from behind with a strap-on'],
-        ['Prone (Male)', 'an adult woman lying face down, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Prone (Female)', 'an adult woman lying face down, an adult female partner fucking her from behind with a strap-on'],
-        ['Prone bone (Male)', 'an adult woman lying flat, an adult male partner fucking her from behind, prone bone, his face out of frame or obscured'],
-        ['Prone bone (Female)', 'an adult woman lying flat, an adult female partner fucking her from behind with a strap-on, prone bone'],
-        ['Pillow under hips (Male)', 'an adult woman lying with a pillow under her hips, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Pillow under hips (Female)', 'an adult woman lying with a pillow under her hips, an adult female partner fucking her from behind with a strap-on'],
-        ['Standing from behind (Male)', 'an adult woman standing and bent forward, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Standing from behind (Female)', 'an adult woman standing and bent forward, an adult female partner fucking her from behind with a strap-on'],
-        ['Against the wall from behind (Male)', 'an adult woman against a wall, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Against the wall from behind (Female)', 'an adult woman against a wall, an adult female partner fucking her from behind with a strap-on'],
-        ['On a couch (Male)', 'an adult woman kneeling on a couch, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['On a couch (Female)', 'an adult woman kneeling on a couch, an adult female partner fucking her from behind with a strap-on'],
-        ['Cowgirl (Male)', 'an adult woman riding an adult male partner, him fucking her, cowgirl, his face out of frame or obscured'],
-        ['Cowgirl (Female)', 'an adult woman riding an adult female partner, that partner fucking her with a strap-on, cowgirl'],
-        ['Reverse cowgirl (Male)', 'an adult woman facing away and riding an adult male partner, him fucking her, reverse cowgirl, his face out of frame or obscured'],
-        ['Reverse cowgirl (Female)', 'an adult woman facing away and riding an adult female partner, that partner fucking her with a strap-on, reverse cowgirl'],
-        ['Squatting on top (Male)', 'an adult woman squatting over an adult male partner and riding him, his face out of frame or obscured'],
-        ['Squatting on top (Female)', 'an adult woman squatting over an adult female partner, that partner fucking her with a strap-on'],
-        ['Amazon (Male)', 'an adult woman pinning an adult male partner and riding him, amazon, his face out of frame or obscured'],
-        ['Amazon (Female)', 'an adult woman pinning an adult female partner and riding her, that partner fucking her with a strap-on, amazon'],
-        ['Anal cowgirl (Male)', 'an adult woman riding an adult male partner, him fucking her ass, cowgirl, his face out of frame or obscured'],
-        ['Anal cowgirl (Female)', 'an adult woman riding an adult female partner, that partner fucking her ass with a strap-on, cowgirl'],
-        ['Against a wall (Male)', 'an adult woman against a wall, an adult male partner fucking her, his face out of frame or obscured'],
-        ['Against a wall (Female)', 'an adult woman against a wall, an adult female partner fucking her with a strap-on'],
-        ['Standing, one leg up (Male)', 'an adult woman standing with one leg lifted, an adult male partner fucking her, his face out of frame or obscured'],
-        ['Standing, one leg up (Female)', 'an adult woman standing with one leg lifted, an adult female partner fucking her with a strap-on'],
-        ['Suspended (Male)', 'an adult woman held up, an adult male partner fucking her standing, his face out of frame or obscured'],
-        ['Suspended (Female)', 'an adult woman held up, an adult female partner fucking her standing with a strap-on'],
-        ['On a chair (Male)', 'an adult woman on a chair, an adult male partner fucking her, his face out of frame or obscured'],
-        ['On a chair (Female)', 'an adult woman on a chair, an adult female partner fucking her with a strap-on'],
-        ['Spooning (Male)', 'an adult woman on her side, an adult male partner fucking her from behind, spooning, his face out of frame or obscured'],
-        ['Spooning (Female)', 'an adult woman on her side, an adult female partner fucking her from behind with a strap-on, spooning'],
-        ['From the side (Male)', 'an adult woman lying on her side, an adult male partner fucking her from the side, his face out of frame or obscured'],
-        ['From the side (Female)', 'an adult woman lying on her side, an adult female partner fucking her from the side with a strap-on'],
-        ['Pretzel (Male)', 'an adult woman twisted on her side, an adult male partner fucking her, pretzel, his face out of frame or obscured'],
-        ['Pretzel (Female)', 'an adult woman twisted on her side, an adult female partner fucking her with a strap-on, pretzel'],
-        ['Lotus (Male)', 'an adult woman sitting face to face with an adult male partner, him fucking her, lotus, his face out of frame or obscured'],
-        ['Lotus (Female)', 'an adult woman sitting face to face with an adult female partner, that partner fucking her with a strap-on, lotus'],
-        ['Edge of the bed (Male)', 'an adult woman on the edge of a bed, an adult male partner standing and fucking her, his face out of frame or obscured'],
-        ['Edge of the bed (Female)', 'an adult woman on the edge of a bed, an adult female partner standing and fucking her with a strap-on'],
-        ['Lap (Male)', 'an adult woman in the lap of an adult male partner, him fucking her, his face out of frame or obscured'],
-        ['Lap (Female)', 'an adult woman in the lap of an adult female partner, that partner fucking her with a strap-on'],
-        ['Full nelson (Male)', 'an adult woman held in a full nelson, an adult male partner fucking her, his face out of frame or obscured'],
-        ['Full nelson (Female)', 'an adult woman held in a full nelson, an adult female partner fucking her with a strap-on'],
-        ['Wheelbarrow (Male)', 'an adult woman held in a wheelbarrow, an adult male partner fucking her from behind, his face out of frame or obscured'],
-        ['Wheelbarrow (Female)', 'an adult woman held in a wheelbarrow, an adult female partner fucking her from behind with a strap-on'],
-        ['Piledriver (Male)', 'an adult woman folded under an adult male partner, him fucking her, piledriver, his face out of frame or obscured'],
-        ['Piledriver (Female)', 'an adult woman folded under an adult female partner, that partner fucking her with a strap-on, piledriver'],
-        ['Anal (Male)', 'an adult woman, an adult male partner fucking her ass, his face out of frame or obscured'],
-        ['Anal (Female)', 'an adult woman, an adult female partner fucking her ass with a strap-on'],
-        ['Anal from behind (Male)', 'an adult woman, an adult male partner fucking her ass from behind, his face out of frame or obscured'],
-        ['Anal from behind (Female)', 'an adult woman, an adult female partner fucking her ass from behind with a strap-on'],
-        ['Anal missionary (Male)', 'an adult woman lying on her back, an adult male partner fucking her ass, missionary, his face out of frame or obscured'],
-        ['Anal missionary (Female)', 'an adult woman lying on her back, an adult female partner fucking her ass with a strap-on, missionary'],
-        ['Receiving oral (Male)', 'an adult woman, an adult male partner licking her, oral sex, his face out of frame or obscured'],
-        ['Receiving oral (Female)', 'an adult woman, an adult female partner licking her, oral sex'],
-        ['Giving oral (Male)', 'an adult woman sucking an adult male partner, oral sex, his face out of frame or obscured'],
-        ['Giving oral (Female)', 'an adult woman licking an adult female partner, oral sex'],
-        ['Handjob (Male)', 'an adult woman stroking an adult male partner with her hand, his face out of frame or obscured'],
-        ['Handjob (Female)', 'an adult woman stroking an adult female partner with her hand'],
-        ['Paizuri (Male)', 'an adult woman fucking an adult male partner with her breasts, his face out of frame or obscured'],
-        ['Paizuri (Female)', 'an adult woman pressing her breasts around a strap-on worn by an adult female partner'],
-        ['Sixty-nine (Male)', 'an adult woman and an adult male partner, oral sex, sixty-nine, his face out of frame or obscured'],
-        ['Sixty-nine (Female)', 'an adult woman and an adult female partner, oral sex, sixty-nine'],
-        ['Facesitting (Male)', 'an adult woman sitting on the face of an adult male partner, his face obscured'],
-        ['Facesitting (Female)', 'an adult woman sitting on the face of an adult female partner'],
-        ['Fingering (Male)', 'an adult woman, an adult male partner fingering her, his face out of frame or obscured'],
-        ['Fingering (Female)', 'an adult woman, an adult female partner fingering her'],
-        ['Scissoring (Female)', 'an adult woman, an adult female partner scissoring with her'],
-        ['After (Male)', 'an adult woman lying with an adult male partner after sex, his face out of frame or obscured'],
-        ['After (Female)', 'an adult woman lying with an adult female partner after sex'],
+        ['Missionary (Male)', maleVaginal('an adult woman lying on her back', 'missionary'), 'hetero, sex, vaginal, penis, missionary, penetration, faceless_male'],
+        ['Missionary (Female)', femaleVaginal('an adult woman lying on her back', 'missionary'), 'yuri, sex, vaginal, strap-on, missionary, penetration'],
+        ['Mating press (Male)', maleVaginal('an adult woman folded back', 'mating press'), 'hetero, sex, vaginal, penis, mating_press, folded, penetration, faceless_male'],
+        ['Mating press (Female)', femaleVaginal('an adult woman folded back', 'mating press'), 'yuri, sex, vaginal, strap-on, mating_press, penetration'],
+        ['Legs up (Male)', maleVaginal('an adult woman on her back with her legs up', 'legs up'), 'hetero, sex, vaginal, penis, legs_up, missionary, penetration, faceless_male'],
+        ['Legs up (Female)', femaleVaginal('an adult woman on her back with her legs up', 'legs up'), 'yuri, sex, vaginal, strap-on, legs_up, penetration'],
+        ['Legs over shoulders (Male)', maleVaginal('an adult woman on her back with her legs over his shoulders', 'legs over shoulders'), 'hetero, sex, vaginal, penis, legs_up, folded, penetration, faceless_male'],
+        ['Legs over shoulders (Female)', femaleVaginal('an adult woman on her back with her legs raised high', 'legs over shoulders'), 'yuri, sex, vaginal, strap-on, legs_up, penetration'],
+        ['From behind (Male)', maleVaginal('an adult woman bent forward', 'sex from behind'), 'hetero, sex, vaginal, penis, sex_from_behind, penetration, faceless_male'],
+        ['From behind (Female)', femaleVaginal('an adult woman bent forward', 'sex from behind'), 'yuri, sex, vaginal, strap-on, sex_from_behind, penetration'],
+        ['Doggystyle (Male)', maleVaginal('an adult woman on her hands and knees', 'doggystyle'), 'hetero, sex, vaginal, penis, doggystyle, sex_from_behind, penetration, faceless_male'],
+        ['Doggystyle (Female)', femaleVaginal('an adult woman on her hands and knees', 'doggystyle'), 'yuri, sex, vaginal, strap-on, doggystyle, sex_from_behind, penetration'],
+        ['Doggystyle, chest down (Male)', maleVaginal('an adult woman face down and ass up', 'doggystyle, chest down'), 'hetero, sex, vaginal, penis, doggystyle, top-down_bottom-up, sex_from_behind, penetration, faceless_male'],
+        ['Doggystyle, chest down (Female)', femaleVaginal('an adult woman face down and ass up', 'doggystyle, chest down'), 'yuri, sex, vaginal, strap-on, doggystyle, top-down_bottom-up, penetration'],
+        ['Standing doggystyle (Male)', maleVaginal('an adult woman standing and bent forward', 'standing doggystyle'), 'hetero, sex, vaginal, penis, doggystyle, standing_sex, sex_from_behind, penetration, faceless_male'],
+        ['Standing doggystyle (Female)', femaleVaginal('an adult woman standing and bent forward', 'standing doggystyle'), 'yuri, sex, vaginal, strap-on, doggystyle, standing_sex, penetration'],
+        ['Anal doggystyle (Male)', maleAnal('an adult woman on her hands and knees', 'anal doggystyle'), 'hetero, sex, anal, penis, doggystyle, sex_from_behind, penetration, faceless_male'],
+        ['Anal doggystyle (Female)', femaleAnal('an adult woman on her hands and knees', 'anal doggystyle'), 'yuri, sex, anal, strap-on, doggystyle, penetration'],
+        ['Bent over (Male)', maleVaginal('an adult woman bent over', 'bent over, sex from behind'), 'hetero, sex, vaginal, penis, bent_over, sex_from_behind, penetration, faceless_male'],
+        ['Bent over (Female)', femaleVaginal('an adult woman bent over', 'bent over, sex from behind'), 'yuri, sex, vaginal, strap-on, bent_over, sex_from_behind, penetration'],
+        ['Bent over a table (Male)', maleVaginal('an adult woman bent over a table', 'bent over a table, sex from behind'), 'hetero, sex, vaginal, penis, bent_over, sex_from_behind, penetration, faceless_male'],
+        ['Bent over a table (Female)', femaleVaginal('an adult woman bent over a table', 'bent over a table, sex from behind'), 'yuri, sex, vaginal, strap-on, bent_over, sex_from_behind, penetration'],
+        ['Bent over the bed (Male)', maleVaginal('an adult woman bent over the bed', 'bent over the bed, sex from behind'), 'hetero, sex, vaginal, penis, bent_over, on_bed, sex_from_behind, penetration, faceless_male'],
+        ['Bent over the bed (Female)', femaleVaginal('an adult woman bent over the bed', 'bent over the bed, sex from behind'), 'yuri, sex, vaginal, strap-on, bent_over, on_bed, penetration'],
+        ['On hands and knees (Male)', maleVaginal('an adult woman on her hands and knees', 'sex from behind'), 'hetero, sex, vaginal, penis, all_fours, sex_from_behind, penetration, faceless_male'],
+        ['On hands and knees (Female)', femaleVaginal('an adult woman on her hands and knees', 'sex from behind'), 'yuri, sex, vaginal, strap-on, all_fours, sex_from_behind, penetration'],
+        ['Leapfrog (Male)', maleVaginal('an adult woman in a leapfrog', 'leapfrog, sex from behind'), 'hetero, sex, vaginal, penis, all_fours, sex_from_behind, penetration, faceless_male'],
+        ['Leapfrog (Female)', femaleVaginal('an adult woman in a leapfrog', 'leapfrog, sex from behind'), 'yuri, sex, vaginal, strap-on, all_fours, sex_from_behind, penetration'],
+        ['Prone (Male)', maleVaginal('an adult woman lying face down', 'prone, sex from behind'), 'hetero, sex, vaginal, penis, prone_bone, sex_from_behind, penetration, faceless_male'],
+        ['Prone (Female)', femaleVaginal('an adult woman lying face down', 'prone, sex from behind'), 'yuri, sex, vaginal, strap-on, prone_bone, penetration'],
+        ['Prone bone (Male)', maleVaginal('an adult woman lying flat', 'prone bone'), 'hetero, sex, vaginal, penis, prone_bone, sex_from_behind, penetration, faceless_male'],
+        ['Prone bone (Female)', femaleVaginal('an adult woman lying flat', 'prone bone'), 'yuri, sex, vaginal, strap-on, prone_bone, penetration'],
+        ['Pillow under hips (Male)', maleVaginal('an adult woman lying with a pillow under her hips', 'sex from behind'), 'hetero, sex, vaginal, penis, sex_from_behind, penetration, faceless_male'],
+        ['Pillow under hips (Female)', femaleVaginal('an adult woman lying with a pillow under her hips', 'sex from behind'), 'yuri, sex, vaginal, strap-on, sex_from_behind, penetration'],
+        ['Standing from behind (Male)', maleVaginal('an adult woman standing and bent forward', 'standing sex from behind'), 'hetero, sex, vaginal, penis, standing_sex, sex_from_behind, penetration, faceless_male'],
+        ['Standing from behind (Female)', femaleVaginal('an adult woman standing and bent forward', 'standing sex from behind'), 'yuri, sex, vaginal, strap-on, standing_sex, sex_from_behind, penetration'],
+        ['Against the wall from behind (Male)', maleVaginal('an adult woman against a wall', 'against a wall, sex from behind'), 'hetero, sex, vaginal, penis, against_wall, sex_from_behind, penetration, faceless_male'],
+        ['Against the wall from behind (Female)', femaleVaginal('an adult woman against a wall', 'against a wall, sex from behind'), 'yuri, sex, vaginal, strap-on, against_wall, sex_from_behind, penetration'],
+        ['On a couch (Male)', maleVaginal('an adult woman kneeling on a couch', 'sex from behind'), 'hetero, sex, vaginal, penis, sex_from_behind, penetration, faceless_male'],
+        ['On a couch (Female)', femaleVaginal('an adult woman kneeling on a couch', 'sex from behind'), 'yuri, sex, vaginal, strap-on, sex_from_behind, penetration'],
+        ['Cowgirl (Male)', maleVaginal('an adult woman riding an adult male partner', 'cowgirl'), 'hetero, sex, vaginal, penis, girl_on_top, cowgirl_position, penetration, faceless_male'],
+        ['Cowgirl (Female)', femaleVaginal('an adult woman riding an adult female partner', 'cowgirl'), 'yuri, sex, vaginal, strap-on, girl_on_top, cowgirl_position, penetration'],
+        ['Reverse cowgirl (Male)', maleVaginal('an adult woman facing away and riding an adult male partner', 'reverse cowgirl'), 'hetero, sex, vaginal, penis, girl_on_top, reverse_cowgirl_position, penetration, faceless_male'],
+        ['Reverse cowgirl (Female)', femaleVaginal('an adult woman facing away and riding an adult female partner', 'reverse cowgirl'), 'yuri, sex, vaginal, strap-on, reverse_cowgirl_position, penetration'],
+        ['Squatting on top (Male)', maleVaginal('an adult woman squatting over an adult male partner', 'squatting cowgirl'), 'hetero, sex, vaginal, penis, girl_on_top, squatting, penetration, faceless_male'],
+        ['Squatting on top (Female)', femaleVaginal('an adult woman squatting over an adult female partner', 'squatting cowgirl'), 'yuri, sex, vaginal, strap-on, girl_on_top, squatting, penetration'],
+        ['Amazon (Male)', maleVaginal('an adult woman pinning an adult male partner and riding him', 'amazon'), 'hetero, sex, vaginal, penis, girl_on_top, penetration, faceless_male'],
+        ['Amazon (Female)', femaleVaginal('an adult woman pinning an adult female partner and riding her', 'amazon'), 'yuri, sex, vaginal, strap-on, girl_on_top, penetration'],
+        ['Anal cowgirl (Male)', maleAnal('an adult woman riding an adult male partner', 'anal cowgirl'), 'hetero, sex, anal, penis, girl_on_top, cowgirl_position, penetration, faceless_male'],
+        ['Anal cowgirl (Female)', femaleAnal('an adult woman riding an adult female partner', 'anal cowgirl'), 'yuri, sex, anal, strap-on, cowgirl_position, penetration'],
+        ['Against a wall (Male)', maleVaginal('an adult woman against a wall with one leg lifted', 'standing sex'), 'hetero, sex, vaginal, penis, against_wall, standing_sex, penetration, faceless_male'],
+        ['Against a wall (Female)', femaleVaginal('an adult woman against a wall with one leg lifted', 'standing sex'), 'yuri, sex, vaginal, strap-on, against_wall, standing_sex, penetration'],
+        ['Standing, one leg up (Male)', maleVaginal('an adult woman standing with one leg lifted', 'standing sex'), 'hetero, sex, vaginal, penis, standing_sex, penetration, faceless_male'],
+        ['Standing, one leg up (Female)', femaleVaginal('an adult woman standing with one leg lifted', 'standing sex'), 'yuri, sex, vaginal, strap-on, standing_sex, penetration'],
+        ['Suspended (Male)', maleVaginal('an adult woman held up off the ground', 'suspended congress'), 'hetero, sex, vaginal, penis, standing_sex, suspended_congress, penetration, faceless_male'],
+        ['Suspended (Female)', femaleVaginal('an adult woman held up off the ground', 'suspended congress'), 'yuri, sex, vaginal, strap-on, standing_sex, suspended_congress, penetration'],
+        ['On a chair (Male)', maleVaginal('an adult woman sitting on a chair facing an adult male partner', 'sitting sex'), 'hetero, sex, vaginal, penis, sitting, penetration, faceless_male'],
+        ['On a chair (Female)', femaleVaginal('an adult woman sitting on a chair facing an adult female partner', 'sitting sex'), 'yuri, sex, vaginal, strap-on, sitting, penetration'],
+        ['Spooning (Male)', maleVaginal('an adult woman on her side', 'spooning, sex from behind'), 'hetero, sex, vaginal, penis, spooning, sex_from_behind, penetration, faceless_male'],
+        ['Spooning (Female)', femaleVaginal('an adult woman on her side', 'spooning, sex from behind'), 'yuri, sex, vaginal, strap-on, spooning, sex_from_behind, penetration'],
+        ['From the side (Male)', maleVaginal('an adult woman lying on her side', 'sex from the side'), 'hetero, sex, vaginal, penis, on_side, penetration, faceless_male'],
+        ['From the side (Female)', femaleVaginal('an adult woman lying on her side', 'sex from the side'), 'yuri, sex, vaginal, strap-on, on_side, penetration'],
+        ['Pretzel (Male)', maleVaginal('an adult woman twisted on her side', 'pretzel'), 'hetero, sex, vaginal, penis, penetration, faceless_male'],
+        ['Pretzel (Female)', femaleVaginal('an adult woman twisted on her side', 'pretzel'), 'yuri, sex, vaginal, strap-on, penetration'],
+        ['Lotus (Male)', maleVaginal('an adult woman sitting in the lap of an adult male partner face to face', 'lotus'), 'hetero, sex, vaginal, penis, sitting, penetration, faceless_male'],
+        ['Lotus (Female)', femaleVaginal('an adult woman sitting in the lap of an adult female partner face to face', 'lotus'), 'yuri, sex, vaginal, strap-on, sitting, penetration'],
+        ['Edge of the bed (Male)', maleVaginal('an adult woman on the edge of a bed', 'standing sex'), 'hetero, sex, vaginal, penis, standing_sex, on_bed, penetration, faceless_male'],
+        ['Edge of the bed (Female)', femaleVaginal('an adult woman on the edge of a bed', 'standing sex'), 'yuri, sex, vaginal, strap-on, standing_sex, on_bed, penetration'],
+        ['Lap (Male)', maleVaginal('an adult woman straddling the lap of an adult male partner', 'lap sex'), 'hetero, sex, vaginal, penis, girl_on_top, sitting, penetration, faceless_male'],
+        ['Lap (Female)', femaleVaginal('an adult woman straddling the lap of an adult female partner', 'lap sex'), 'yuri, sex, vaginal, strap-on, girl_on_top, sitting, penetration'],
+        ['Full nelson (Male)', maleVaginal('an adult woman held in a full nelson', 'full nelson'), 'hetero, sex, vaginal, penis, full_nelson, penetration, faceless_male'],
+        ['Full nelson (Female)', femaleVaginal('an adult woman held in a full nelson', 'full nelson'), 'yuri, sex, vaginal, strap-on, full_nelson, penetration'],
+        ['Wheelbarrow (Male)', maleVaginal('an adult woman held in a wheelbarrow', 'wheelbarrow, sex from behind'), 'hetero, sex, vaginal, penis, sex_from_behind, penetration, faceless_male'],
+        ['Wheelbarrow (Female)', femaleVaginal('an adult woman held in a wheelbarrow', 'wheelbarrow, sex from behind'), 'yuri, sex, vaginal, strap-on, sex_from_behind, penetration'],
+        ['Piledriver (Male)', maleVaginal('an adult woman folded under an adult male partner', 'piledriver'), 'hetero, sex, vaginal, penis, piledriver, penetration, faceless_male'],
+        ['Piledriver (Female)', femaleVaginal('an adult woman folded under an adult female partner', 'piledriver'), 'yuri, sex, vaginal, strap-on, piledriver, penetration'],
+        ['Anal (Male)', maleAnal('an adult woman lying on her back', 'anal'), 'hetero, sex, anal, penis, penetration, faceless_male'],
+        ['Anal (Female)', femaleAnal('an adult woman lying on her back', 'anal'), 'yuri, sex, anal, strap-on, penetration'],
+        ['Anal from behind (Male)', maleAnal('an adult woman bent forward', 'anal from behind'), 'hetero, sex, anal, penis, sex_from_behind, penetration, faceless_male'],
+        ['Anal from behind (Female)', femaleAnal('an adult woman bent forward', 'anal from behind'), 'yuri, sex, anal, strap-on, sex_from_behind, penetration'],
+        ['Anal missionary (Male)', maleAnal('an adult woman lying on her back', 'anal missionary'), 'hetero, sex, anal, penis, missionary, penetration, faceless_male'],
+        ['Anal missionary (Female)', femaleAnal('an adult woman lying on her back', 'anal missionary'), 'yuri, sex, anal, strap-on, missionary, penetration'],
+        ['Receiving oral (Male)', 'an adult woman lying back, an adult male partner licking her pussy, his mouth on her pussy, cunnilingus, only his face out of frame or obscured', 'hetero, cunnilingus, oral, faceless_male'],
+        ['Receiving oral (Female)', 'an adult woman lying back, an adult female partner licking her pussy, her mouth on her pussy, cunnilingus', 'yuri, cunnilingus, oral'],
+        ['Giving oral (Male)', 'an adult woman with an adult male partner penis in her mouth, sucking his penis, fellatio, only his face out of frame or obscured', 'hetero, fellatio, penis, oral, faceless_male'],
+        ['Giving oral (Female)', 'an adult woman licking an adult female partner pussy, cunnilingus', 'yuri, cunnilingus, oral'],
+        ['Handjob (Male)', 'an adult woman stroking an adult male partner penis with her hand, her hand on his penis, handjob, only his face out of frame or obscured', 'hetero, handjob, penis, faceless_male'],
+        ['Handjob (Female)', 'an adult woman stroking a strap-on worn by an adult female partner with her hand, handjob', 'yuri, handjob, strap-on'],
+        ['Paizuri (Male)', 'an adult woman with an adult male partner penis between her breasts, paizuri, only his face out of frame or obscured', 'hetero, paizuri, penis, faceless_male'],
+        ['Paizuri (Female)', 'an adult woman with a strap-on worn by an adult female partner between her breasts, paizuri', 'yuri, paizuri, strap-on'],
+        ['Sixty-nine (Male)', 'an adult woman and an adult male partner in a sixty-nine, his penis in her mouth and his mouth on her pussy, only his face out of frame or obscured', 'hetero, 69, fellatio, cunnilingus, penis, faceless_male'],
+        ['Sixty-nine (Female)', 'an adult woman and an adult female partner in a sixty-nine, each mouth on the other pussy', 'yuri, 69, cunnilingus'],
+        ['Facesitting (Male)', 'an adult woman sitting on the face of an adult male partner, his mouth on her pussy, facesitting, his face obscured', 'hetero, facesitting, cunnilingus, faceless_male'],
+        ['Facesitting (Female)', 'an adult woman sitting on the face of an adult female partner, that partner mouth on her pussy, facesitting', 'yuri, facesitting, cunnilingus'],
+        ['Fingering (Male)', 'an adult male partner fingering an adult woman, his fingers inside her vagina, fingering, only his face out of frame or obscured', 'hetero, fingering, faceless_male'],
+        ['Fingering (Female)', 'an adult female partner fingering an adult woman, her fingers inside her vagina, fingering', 'yuri, fingering'],
+        ['Scissoring (Female)', 'an adult woman and an adult female partner scissoring, their pussies pressed together', 'yuri, tribadism'],
+        ['After (Male)', 'an adult woman lying with an adult male partner after sex, bodies still together, only his face out of frame or obscured', 'hetero, after_sex, faceless_male'],
+        ['After (Female)', 'an adult woman lying with an adult female partner after sex, bodies still together', 'yuri, after_sex'],
       ],
     },
     {
@@ -852,7 +873,12 @@
 
   function renderAdd(add, format) {
     if (add.tag && format !== 'natural') {
-      return format === 'danbooru' ? add.tag.replace(/\s+/g, '_') : add.tag.replace(/_/g, ' ');
+      if (format === 'danbooru') {
+        return add.tag.split(',').map(function (part) {
+          return part.trim().replace(/\s+/g, '_');
+        }).filter(Boolean).join(', ');
+      }
+      return add.tag.replace(/_/g, ' ');
     }
     return formatPhrase(add.text, format);
   }
@@ -862,7 +888,8 @@
     if (!adds.length) return { prompts: prompts, notes: [] };
     const used = {};
     const next = (prompts || []).map(function (prompt) {
-      const parts = [];
+      const sexParts = [];
+      const restParts = [];
       adds.forEach(function (add) {
         if (hasAny(prompt, add.keys)) return;
         const text = add.clothing
@@ -870,12 +897,16 @@
             return hasAny(String(input || '') + '\n' + String(prompt || ''), [word]);
           })
           : add.text;
-        parts.push(renderAdd({ text: text, tag: add.tag }, format));
+        const rendered = renderAdd({ text: text, tag: add.tag }, format);
+        if (add.id === 'sex-scene') sexParts.push(rendered);
+        else restParts.push(rendered);
         used[add.label] = true;
       });
-      if (!parts.length) return prompt;
-      const body = String(prompt || '').replace(/\s+$/, '');
-      return body ? body.replace(/[.\s]*$/, '') + ', ' + parts.join(', ') : parts.join(', ');
+      if (!sexParts.length && !restParts.length) return prompt;
+      let body = String(prompt || '').replace(/\s+$/, '').replace(/[.\s]*$/, '');
+      if (sexParts.length) body = body ? sexParts.join(', ') + ', ' + body : sexParts.join(', ');
+      if (restParts.length) body = body ? body + ', ' + restParts.join(', ') : restParts.join(', ');
+      return body;
     });
     const labels = Object.keys(used);
     return {
@@ -921,7 +952,7 @@
       '<div class="character-dialog" role="dialog" aria-labelledby="extra-title">',
       '<div class="character-head"><h2 id="extra-title">More variations</h2>',
       '<button type="button" class="text-btn" id="extra-close">Close</button></div>',
-      '<p class="extra-note">A choice is added when you generate, and only when that idea is not already in the prompt you typed. Color and pattern are typed beside Wardrobe and Lingerie and added to that clothing only. On a male partner sex scene, his face is out of frame or obscured. Motion is added only for a video model.</p>',
+      '<p class="extra-note">A choice is added when you generate, and only when that idea is not already in the prompt you typed. Color and pattern are typed beside Wardrobe and Lingerie and added to that clothing only. A sex scene is placed at the start of the prompt and names the sex act. On a male partner sex scene, his face is out of frame or obscured. Motion is added only for a video model.</p>',
       '<div id="extra-bar" class="extra-bar">',
       MENUS.map(function (menu) { return renderMenu(menu, saved); }).join(''),
       '</div>',
