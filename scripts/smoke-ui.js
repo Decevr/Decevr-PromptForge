@@ -90,10 +90,18 @@ app.whenReady().then(async () => {
     const motionVideo = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural', 'video').prompts[0];
     const motionSkipped = window.PromptForgeExtras.apply(['close-up'], 'already thrusting', 'natural', 'video').prompts[0];
     document.getElementById('extra-motion').value = '';
-    document.getElementById('extra-sex-scene').value = 'an adult woman, an adult male partner fucking her from behind';
+    const sexOptions = [...document.querySelectorAll('#extra-sex-scene option')];
+    const maleFace = sexOptions.filter((option) => /\(Male\)/.test(option.textContent)).every((option) => {
+      return /his face out of frame or obscured/.test(option.value) || (option.textContent === 'Facesitting (Male)' && /his face obscured/.test(option.value));
+    });
+    const femaleFace = sexOptions.filter((option) => /\(Female\)/.test(option.textContent)).some((option) => /his face/.test(option.value));
+    const doggyLabel = sexOptions.some((option) => option.textContent === 'Doggystyle (Male)');
+    document.getElementById('extra-sex-scene').value = 'an adult woman, an adult male partner fucking her from behind, his face out of frame or obscured';
     const sceneMale = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     document.getElementById('extra-sex-scene').value = 'an adult woman, an adult female partner fucking her from behind with a strap-on';
     const sceneFemale = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
+    document.getElementById('extra-sex-scene').value = 'an adult woman on her hands and knees, an adult male partner fucking her from behind, doggystyle, his face out of frame or obscured';
+    const sceneDoggy = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     document.getElementById('extra-sex-scene').value = '';
     const wardrobeColor = document.getElementById('extra-wardrobe-color');
     const wardrobePattern = document.getElementById('extra-wardrobe-pattern');
@@ -132,7 +140,7 @@ app.whenReady().then(async () => {
     wardrobeColor.value = 'red';
     const clothingIdle = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     wardrobeColor.value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionImage, motionVideo, motionSkipped, sceneMale, sceneFemale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, clothingApron, clothingShirt, clothingIdle });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionImage, motionVideo, motionSkipped, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, clothingApron, clothingShirt, clothingIdle });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -169,8 +177,11 @@ app.whenReady().then(async () => {
   if (/thrusting/.test(parsed.motionImage)) problems.push('motion added on an image model: ' + parsed.motionImage);
   if (!/thrusting slowly/.test(parsed.motionVideo)) problems.push('motion missing on video: ' + parsed.motionVideo);
   if (/thrusting slowly/.test(parsed.motionSkipped)) problems.push('motion replaced a typed motion: ' + parsed.motionSkipped);
-  if (!/adult male partner fucking her from behind/.test(parsed.sceneMale)) problems.push('male sex scene: ' + parsed.sceneMale);
-  if (!/adult female partner fucking her from behind with a strap-on/.test(parsed.sceneFemale)) problems.push('female sex scene: ' + parsed.sceneFemale);
+  if (!/adult male partner fucking her from behind/.test(parsed.sceneMale) || !/his face out of frame or obscured/.test(parsed.sceneMale)) problems.push('male sex scene: ' + parsed.sceneMale);
+  if (!/adult female partner fucking her from behind with a strap-on/.test(parsed.sceneFemale) || /his face/.test(parsed.sceneFemale)) problems.push('female sex scene: ' + parsed.sceneFemale);
+  if (!parsed.maleFace) problems.push('a male sex scene is missing the hidden face');
+  if (parsed.femaleFace) problems.push('a female sex scene hid his face');
+  if (!parsed.doggyLabel || !/doggystyle/.test(parsed.sceneDoggy) || !/his face out of frame or obscured/.test(parsed.sceneDoggy)) problems.push('doggystyle: ' + parsed.sceneDoggy);
   if (!parsed.clothingInputs) problems.push('clothing color and pattern are not text inputs');
   if (!/wearing a red floral evening dress/.test(parsed.clothingPainted)) problems.push('wardrobe color: ' + parsed.clothingPainted);
   if (!/wearing_a_red_floral_evening_dress/.test(parsed.clothingTags)) problems.push('wardrobe tags: ' + parsed.clothingTags);
