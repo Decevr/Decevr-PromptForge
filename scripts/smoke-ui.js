@@ -65,6 +65,8 @@ app.whenReady().then(async () => {
     document.getElementById('extra-close').click();
     const extraClosed = document.getElementById('extra-modal').hidden === true;
     const artistCount = document.querySelectorAll('#extra-artist option').length;
+    const comicCount = document.querySelectorAll('#extra-artist optgroup[label="Comics"] option').length;
+    const hairChoices = document.querySelectorAll('#extra-hair option').length;
     document.getElementById('extra-hair').value = 'long wavy hair';
     const hairAdded = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'danbooru').prompts[0];
     const hairSkipped = window.PromptForgeExtras.apply(['close-up'], 'blonde hair', 'danbooru').prompts[0];
@@ -74,7 +76,7 @@ app.whenReady().then(async () => {
     const artistSkipped = window.PromptForgeExtras.apply(['close-up'], 'wlop portrait', 'danbooru').prompts[0];
     const artistNatural = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     document.getElementById('extra-artist').value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -103,10 +105,12 @@ app.whenReady().then(async () => {
   if (parsed.lensCount < 25) problems.push('lens count: ' + parsed.lensCount);
   if (parsed.stealthCount < 12) problems.push('stealth count: ' + parsed.stealthCount);
   if (!parsed.stealthLabel) problems.push('stealth masturbation button missing');
-  if (parsed.extraCount < 11) problems.push('variation menus: ' + parsed.extraCount);
+  if (parsed.extraCount < 13) problems.push('variation menus: ' + parsed.extraCount);
   if (parsed.extraOnFront) problems.push('variation menus are on the front of the app');
   if (!parsed.extraHidden || !parsed.extraOpen || !parsed.extraClosed) problems.push('variation panel did not open and close');
-  if (parsed.artistCount < 20) problems.push('artist list: ' + parsed.artistCount);
+  if (parsed.artistCount < 40) problems.push('artist list: ' + parsed.artistCount);
+  if (parsed.comicCount < 20) problems.push('comic artists: ' + parsed.comicCount);
+  if (parsed.hairChoices < 25) problems.push('hairstyles: ' + parsed.hairChoices);
   if (!/long_wavy_hair/.test(parsed.hairAdded)) problems.push('hairstyle was not added: ' + parsed.hairAdded);
   if (/long_wavy_hair/.test(parsed.hairSkipped)) problems.push('hairstyle replaced typed hair: ' + parsed.hairSkipped);
   if (!/\bwlop\b/.test(parsed.artistAdded)) problems.push('artist tag was not added: ' + parsed.artistAdded);
