@@ -77,7 +77,12 @@ app.whenReady().then(async () => {
     const artistSkipped = window.PromptForgeExtras.apply(['close-up'], 'wlop portrait', 'danbooru').prompts[0];
     const artistNatural = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     document.getElementById('extra-artist').value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural });
+    document.getElementById('extra-motion').value = 'two adults thrusting slowly';
+    const motionImage = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural', 'image').prompts[0];
+    const motionVideo = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural', 'video').prompts[0];
+    const motionSkipped = window.PromptForgeExtras.apply(['close-up'], 'already thrusting', 'natural', 'video').prompts[0];
+    document.getElementById('extra-motion').value = '';
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionImage, motionVideo, motionSkipped });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -106,7 +111,10 @@ app.whenReady().then(async () => {
   if (parsed.lensCount < 25) problems.push('lens count: ' + parsed.lensCount);
   if (parsed.stealthCount < 12) problems.push('stealth count: ' + parsed.stealthCount);
   if (!parsed.stealthLabel) problems.push('stealth masturbation button missing');
-  if (parsed.extraCount < 14) problems.push('variation menus: ' + parsed.extraCount);
+  if (parsed.extraCount < 15) problems.push('variation menus: ' + parsed.extraCount);
+  if (/thrusting/.test(parsed.motionImage)) problems.push('motion added on an image model: ' + parsed.motionImage);
+  if (!/thrusting slowly/.test(parsed.motionVideo)) problems.push('motion missing on video: ' + parsed.motionVideo);
+  if (/thrusting slowly/.test(parsed.motionSkipped)) problems.push('motion replaced a typed motion: ' + parsed.motionSkipped);
   if (parsed.lingerieChoices < 40) problems.push('lingerie: ' + parsed.lingerieChoices);
   if (parsed.extraOnFront) problems.push('variation menus are on the front of the app');
   if (!parsed.extraHidden || !parsed.extraOpen || !parsed.extraClosed) problems.push('variation panel did not open and close');

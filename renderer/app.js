@@ -309,7 +309,7 @@
       variationOffset: variationOffset || 0,
     });
     if (window.PromptForgeExtras && output && output.prompts) {
-      const extra = window.PromptForgeExtras.apply(output.prompts, els.input.value, output.format);
+      const extra = window.PromptForgeExtras.apply(output.prompts, els.input.value, output.format, model && model.category);
       output.prompts = extra.prompts;
       output.notes = (output.notes || []).concat(extra.notes || []);
     }

@@ -573,6 +573,44 @@
         ['High contrast', 'punched contrast'],
       ],
     },
+    {
+      id: 'motion',
+      label: 'Motion',
+      videoOnly: true,
+      keys: ['thrusting', 'thrust', 'thrusts', 'grinding', 'grind', 'bouncing', 'bounce', 'rocking', 'bobbing', 'stroking', 'strokes', 'pounding', 'twerking', 'swaying', 'pulsing', 'fingering', 'riding', 'gyrating', 'clenching', 'twitching', 'in and out'],
+      options: [
+        ['Slow thrusts', 'two adults thrusting slowly'],
+        ['Deep thrusts', 'two adults thrusting deep'],
+        ['Fast thrusts', 'two adults thrusting fast'],
+        ['Hard thrusts', 'two adults thrusting hard'],
+        ['Shallow thrusts', 'two adults, shallow thrusts'],
+        ['Pounding', 'two adults pounding'],
+        ['Long strokes', 'two adults, long strokes'],
+        ['In and out', 'two adults moving in and out'],
+        ['Hip snaps', 'two adults thrusting, hips snapping forward'],
+        ['Pulling closer', 'two adults pulling closer with each thrust'],
+        ['Held and thrusting', 'two adults, one held in place while the other thrusts'],
+        ['Hip rolls', 'an adult rolling their hips'],
+        ['Circular hips', 'an adult moving their hips in a circle'],
+        ['Grinding', 'two adults grinding together'],
+        ['Slow grind', 'two adults grinding slowly'],
+        ['Side grind', 'two adults grinding side to side'],
+        ['Bouncing', 'an adult bouncing'],
+        ['Riding', 'two adults, one riding, rising and falling'],
+        ['Rocking', 'two adults rocking together'],
+        ['Swaying hips', 'an adult swaying their hips'],
+        ['Up and down', 'an adult moving up and down'],
+        ['Body wave', 'an adult rolling a wave through their body'],
+        ['Pulsing', 'an adult pulsing their hips'],
+        ['Gyrating', 'an adult gyrating their hips'],
+        ['Twerking', 'an adult twerking'],
+        ['Clenching', 'an adult clenching and releasing'],
+        ['Twitching', 'an adult hips twitching after each thrust'],
+        ['Oral bobbing', 'an adult bobbing during oral sex'],
+        ['Hand stroking', 'an adult stroking with one hand'],
+        ['Fingering', 'an adult fingering, fingers moving'],
+      ],
+    },
   ];
 
   function loadSaved() {
@@ -624,9 +662,10 @@
     return words.length ? [raw].concat(words) : [raw];
   }
 
-  function selectedAdds(input) {
+  function selectedAdds(input, category) {
     const adds = [];
     MENUS.forEach(function (menu) {
+      if (menu.videoOnly && category !== 'video') return;
       const select = document.getElementById('extra-' + menu.id);
       if (!select || !select.value) return;
       const option = menu.options.find(function (item) { return item[1] === select.value; });
@@ -652,8 +691,8 @@
     return formatPhrase(add.text, format);
   }
 
-  function apply(prompts, input, format) {
-    const adds = selectedAdds(input);
+  function apply(prompts, input, format, category) {
+    const adds = selectedAdds(input, category);
     if (!adds.length) return { prompts: prompts, notes: [] };
     const used = {};
     const next = (prompts || []).map(function (prompt) {
@@ -688,7 +727,8 @@
       options.push('<option value="' + escapeHtml(option[1]) + '"' + selected + '>' + escapeHtml(option[0]) + '</option>');
     });
     if (group) options.push('</optgroup>');
-    return '<label class="extra-field"><span>' + escapeHtml(menu.label) + '</span><select id="extra-' + menu.id + '">' + options.join('') + '</select></label>';
+    const hint = menu.videoOnly ? ' title="Added only for video models"' : '';
+    return '<label class="extra-field"' + hint + '><span>' + escapeHtml(menu.label) + '</span><select id="extra-' + menu.id + '">' + options.join('') + '</select></label>';
   }
 
   function init() {
@@ -702,7 +742,7 @@
       '<div class="character-dialog" role="dialog" aria-labelledby="extra-title">',
       '<div class="character-head"><h2 id="extra-title">More variations</h2>',
       '<button type="button" class="text-btn" id="extra-close">Close</button></div>',
-      '<p class="extra-note">A choice is added when you generate, and only when that idea is not already in the prompt you typed.</p>',
+      '<p class="extra-note">A choice is added when you generate, and only when that idea is not already in the prompt you typed. Motion is added only for a video model.</p>',
       '<div id="extra-bar" class="extra-bar">',
       MENUS.map(function (menu) { return renderMenu(menu, saved); }).join(''),
       '</div>',
