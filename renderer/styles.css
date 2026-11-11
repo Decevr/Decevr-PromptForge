@@ -674,6 +674,8 @@ h2 {
   gap: 10px;
 }
 
+.character-form h3.field-section { margin: 18px 0 0; font-size: 15px; }
+
 .character-form label, .stack {
   display: flex;
   flex-direction: column;

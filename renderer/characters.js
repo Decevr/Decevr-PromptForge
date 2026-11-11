@@ -2,22 +2,40 @@
   const STORAGE_KEY = 'promptforge.characters.v1';
   const FIELDS = [
     { key: 'name', label: 'Name', required: true },
-    { key: 'age', label: 'Age' },
+    { key: 'age', label: 'Age', placeholder: '25' },
     { key: 'gender', label: 'Gender' },
     { key: 'race', label: 'Race' },
-    { key: 'hair', label: 'Hair' },
+    { key: 'hair', label: 'Hair', section: 'Look' },
     { key: 'eyes', label: 'Eyes' },
     { key: 'face', label: 'Face / Features' },
+    { key: 'lips', label: 'Lips' },
     { key: 'makeup', label: 'Makeup' },
     { key: 'nails', label: 'Nail polish' },
     { key: 'skin', label: 'Skin' },
-    { key: 'body', label: 'Body type / figure' },
+    { key: 'freckles', label: 'Freckles', section: 'Marks, piercings, and tattoos', placeholder: 'light freckles across the nose' },
+    { key: 'moles', label: 'Moles / beauty marks', placeholder: 'a small mole near the mouth' },
+    { key: 'scars', label: 'Scars' },
+    { key: 'birthmarks', label: 'Birthmarks' },
+    { key: 'piercings', label: 'Piercings', placeholder: 'silver navel piercing' },
+    { key: 'tattoos', label: 'Tattoos', placeholder: 'a small tattoo on the hip' },
+    { key: 'body', label: 'Body type / figure', section: 'Body' },
     { key: 'breasts', label: 'Breasts' },
+    { key: 'nipples', label: 'Nipple color', placeholder: 'pink, brown, dark' },
     { key: 'ass', label: 'Ass' },
+    { key: 'hips', label: 'Hips' },
+    { key: 'waist', label: 'Waist' },
+    { key: 'stomach', label: 'Stomach' },
+    { key: 'thighs', label: 'Thighs' },
+    { key: 'shoulders', label: 'Shoulders' },
+    { key: 'back', label: 'Back' },
+    { key: 'arms', label: 'Arms' },
+    { key: 'hands', label: 'Hands' },
+    { key: 'feet', label: 'Feet' },
     { key: 'vagina', label: 'Vagina' },
     { key: 'penis', label: 'Penis' },
+    { key: 'pubic', label: 'Pubic hair' },
     { key: 'otherBody', label: 'Other body notes' },
-    { key: 'clothing', label: 'Default clothing / state' },
+    { key: 'clothing', label: 'Default clothing / state', section: 'Wardrobe' },
     { key: 'style', label: 'Style notes' },
   ];
 
@@ -75,6 +93,20 @@
     return [name].concat(parts).filter(Boolean).join(', ');
   }
 
+  function renderFieldInputs() {
+    let html = '';
+    let section = '';
+    FIELDS.forEach(function (field) {
+      if (field.section && field.section !== section) {
+        section = field.section;
+        html += '<h3 class="field-section">' + escapeHtml(section) + '</h3>';
+      }
+      const placeholder = field.placeholder ? ' placeholder="' + escapeHtml(field.placeholder) + '"' : '';
+      html += '<label><span>' + escapeHtml(field.label) + (field.required ? ' *' : '') + '</span><input name="' + field.key + '" type="text"' + placeholder + (field.required ? ' required' : '') + ' /></label>';
+    });
+    return html;
+  }
+
   function createModal() {
     const modal = document.createElement('div');
     modal.id = 'character-modal';
@@ -95,10 +127,7 @@
       '<button type="button" class="generate" id="char-random-male">Random male</button>',
       '</div></div>',
       '<h3 id="char-form-title">New character</h3>',
-      FIELDS.map(function (field) {
-        const placeholder = field.key === 'age' ? ' placeholder="25"' : '';
-        return '<label><span>' + field.label + (field.required ? ' *' : '') + '</span><input name="' + field.key + '" type="text"' + placeholder + (field.required ? ' required' : '') + ' /></label>';
-      }).join(''),
+      renderFieldInputs(),
       '<p class="hint" id="char-age-note" hidden></p>',
       '<div class="character-actions"><button type="submit" class="generate">Save character</button>',
       '<button type="button" class="text-btn" id="char-new">New</button></div>',
@@ -182,16 +211,34 @@
         hair: hair,
         eyes: eyes,
         face: pickOne(female
-          ? ['soft features', 'sharp features', 'freckles', 'defined cheekbones']
+          ? ['soft features', 'sharp features', 'defined cheekbones']
           : ['sharp jaw', 'soft features', 'light stubble', 'defined cheekbones']),
+        lips: pickOne(['full lips', 'soft lips', 'defined lips']),
         makeup: female ? pickOne(['natural makeup', 'red lipstick', 'no makeup', 'smoky eyes']) : '',
         nails: female ? pickOne(['red nails', 'nude nails', 'black nails']) : '',
         skin: skin + ' skin',
+        freckles: pickOne(['', '', 'light freckles across the nose', 'freckles on the shoulders', 'freckles across the cheeks']),
+        moles: pickOne(['', '', 'a small mole near the mouth']),
+        scars: '',
+        birthmarks: '',
+        piercings: pickOne(['', '', 'ear piercings', 'a navel piercing', 'a nipple piercing']),
+        tattoos: pickOne(['', '', '', 'a small tattoo on the hip', 'a fine line tattoo on the shoulder']),
         body: pickOne(female ? ['slim', 'athletic', 'curvy', 'hourglass'] : ['lean', 'athletic', 'broad', 'tall']),
         breasts: female ? pickOne(['small breasts', 'medium breasts', 'large breasts']) : '',
+        nipples: pickOne(['pink nipples', 'brown nipples', 'dark nipples', 'pale nipples']),
         ass: pickOne(['toned ass', 'round ass', 'full ass']),
+        hips: pickOne(['narrow hips', 'wide hips', 'full hips']),
+        waist: pickOne(['slim waist', 'narrow waist', 'soft waist']),
+        stomach: pickOne(['flat stomach', 'soft stomach', 'toned stomach']),
+        thighs: pickOne(['slim thighs', 'thick thighs', 'toned thighs']),
+        shoulders: pickOne(['slim shoulders', 'soft shoulders', 'broad shoulders']),
+        back: '',
+        arms: '',
+        hands: '',
+        feet: '',
         vagina: female ? pickOne(['shaved', 'natural']) : '',
         penis: female ? '' : pickOne(['average penis', 'large penis']),
+        pubic: pickOne(['shaved', 'trimmed', 'natural']),
         otherBody: '',
         clothing: pickOne(female
           ? ['red dress', 'black coat', 'silk gown', 'white blouse']

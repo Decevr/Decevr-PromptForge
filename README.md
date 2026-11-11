@@ -23,7 +23,7 @@ A desktop shortcut named PromptForge points at the same app after the first setu
 - Random prompt creation: another card builds a full scene from your keywords. `1girl` or `1boy` becomes one random adult, 21 or older
 - Character templates can save a random female or male adult from the Characters panel
 - Quality tags and negative prompt toggles
-- Character templates: save a description (age, gender, race, hair, eyes, face, makeup, nails, skin, body, breasts, ass, vagina, penis, clothing, style) and insert it in the current format
+- Character templates: save a description (age, gender, race, hair, eyes, face, lips, makeup, nails, skin, freckles, moles, scars, birthmarks, piercings, tattoos, body, breasts, nipple color, ass, hips, waist, stomach, thighs, shoulders, back, arms, hands, feet, vagina, penis, pubic hair, clothing, style) and insert it in the current format
 - Camera angles, lenses, and stealth shots: insert the angle, lens, or stealth scene in natural language or tags. Stealth shots describe an adult act and do not name a camera
 - Negative builder: category checkboxes, custom tags, and saved presets, merged into the model negative
 - More variations: another set from the same prompt, with a different light and framing

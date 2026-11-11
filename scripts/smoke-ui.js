@@ -34,6 +34,10 @@ app.whenReady().then(async () => {
     const credit = document.querySelector('.credit')?.textContent || '';
     document.getElementById('characters-open').click();
     const charOpen = document.getElementById('character-modal').hidden === false;
+    const charFields = ['nipples', 'hips', 'thighs', 'freckles', 'piercings', 'tattoos'].every((name) => {
+      return !!document.querySelector('#character-form [name="' + name + '"]');
+    });
+    const marksHeading = [...document.querySelectorAll('#character-form .field-section')].some((node) => node.textContent === 'Marks, piercings, and tattoos');
     document.getElementById('char-close').click();
     const charClosed = document.getElementById('character-modal').hidden === true;
     document.getElementById('negatives-open').click();
@@ -51,7 +55,7 @@ app.whenReady().then(async () => {
     const stealthCount = document.querySelectorAll('#stealth-list button').length;
     const stealthLabel = [...document.querySelectorAll('#stealth-list button')].some((button) => button.textContent === 'Stealth masturbation');
     const hintMoved = !document.querySelector('.toggles #format-hint') && !!document.querySelector('.status-bar #format-hint');
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -69,6 +73,8 @@ app.whenReady().then(async () => {
   if (!/womna → woman/.test(parsed.spellHint)) problems.push('spellcheck hint: ' + parsed.spellHint);
   if (/post/.test(parsed.spellHint)) problems.push('spellcheck flagged post: ' + parsed.spellHint);
   if (!parsed.charOpen || !parsed.charClosed) problems.push('character modal did not open and close');
+  if (!parsed.charFields) problems.push('character body and mark fields missing');
+  if (!parsed.marksHeading) problems.push('marks section missing');
   if (!/extra people/.test(parsed.negative)) problems.push('custom negative missing: ' + parsed.negative);
   if (parsed.tools.length !== 4) problems.push('tool buttons: ' + parsed.tools.join(', '));
   if (parsed.selectedText !== 'No characters selected') problems.push('selected characters: ' + parsed.selectedText);

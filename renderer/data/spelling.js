@@ -118,6 +118,10 @@
     'stealth', 'masturbating', 'masturbation', 'discreet', 'discreetly', 'fingering',
     'clothed', 'clothes', 'thigh', 'thighs', 'climax', 'orgasm', 'stroking', 'tabletop', 'waist',
     'legs', 'windows', 'call', 'place', 'adults',
+    'nipple', 'nipples', 'hips', 'hip', 'moles', 'mole', 'piercings', 'piercing',
+    'scars', 'scar', 'birthmarks', 'birthmark', 'stomach', 'shoulders', 'navel',
+    'dimples', 'dimple', 'pubic', 'cheeks', 'cheek', 'thick', 'toned', 'narrow',
+    'flat', 'broad', 'trimmed', 'star', 'flag',
   ];
 
   const KEEP = [
