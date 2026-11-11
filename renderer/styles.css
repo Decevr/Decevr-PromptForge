@@ -129,7 +129,7 @@ h1, h2, p { margin: 0; }
 }
 
 .decevr::before {
-  content: "Decevr";
+  content: "Decevr's";
   position: absolute;
   left: 0;
   top: 0;
@@ -146,7 +146,7 @@ h1, h2, p { margin: 0; }
 }
 
 .decevr::after {
-  content: "Decevr";
+  content: "Decevr's";
   position: absolute;
   left: 0;
   top: 0;

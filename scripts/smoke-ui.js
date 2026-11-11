@@ -67,6 +67,7 @@ app.whenReady().then(async () => {
     const artistCount = document.querySelectorAll('#extra-artist option').length;
     const comicCount = document.querySelectorAll('#extra-artist optgroup[label="Comics"] option').length;
     const hairChoices = document.querySelectorAll('#extra-hair option').length;
+    const lingerieChoices = document.querySelectorAll('#extra-lingerie option').length;
     document.getElementById('extra-hair').value = 'long wavy hair';
     const hairAdded = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'danbooru').prompts[0];
     const hairSkipped = window.PromptForgeExtras.apply(['close-up'], 'blonde hair', 'danbooru').prompts[0];
@@ -76,7 +77,7 @@ app.whenReady().then(async () => {
     const artistSkipped = window.PromptForgeExtras.apply(['close-up'], 'wlop portrait', 'danbooru').prompts[0];
     const artistNatural = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     document.getElementById('extra-artist').value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -88,8 +89,8 @@ app.whenReady().then(async () => {
   if (!parsed.settings.includes('CFG')) problems.push('settings missing');
   if (parsed.cards < 5) problems.push('expected variations, got ' + parsed.cards);
   if (parsed.title !== 'PromptForge') problems.push('wordmark: ' + parsed.title);
-  if (parsed.decevr !== 'Decevr') problems.push('decevr plate: ' + parsed.decevr);
-  if (parsed.windowTitle !== 'Decevr PromptForge') problems.push('window title: ' + parsed.windowTitle);
+  if (parsed.decevr !== "Decevr's") problems.push('decevr plate: ' + parsed.decevr);
+  if (parsed.windowTitle !== "Decevr's PromptForge") problems.push('window title: ' + parsed.windowTitle);
   if (parsed.credit !== 'Decevr Co.') problems.push('credit: ' + parsed.credit);
   if (parsed.spellMisses !== 2) problems.push('spellcheck marks: ' + parsed.spellMisses);
   if (!/beuatiful → beautiful/.test(parsed.spellHint)) problems.push('spellcheck hint: ' + parsed.spellHint);
@@ -105,7 +106,8 @@ app.whenReady().then(async () => {
   if (parsed.lensCount < 25) problems.push('lens count: ' + parsed.lensCount);
   if (parsed.stealthCount < 12) problems.push('stealth count: ' + parsed.stealthCount);
   if (!parsed.stealthLabel) problems.push('stealth masturbation button missing');
-  if (parsed.extraCount < 13) problems.push('variation menus: ' + parsed.extraCount);
+  if (parsed.extraCount < 14) problems.push('variation menus: ' + parsed.extraCount);
+  if (parsed.lingerieChoices < 40) problems.push('lingerie: ' + parsed.lingerieChoices);
   if (parsed.extraOnFront) problems.push('variation menus are on the front of the app');
   if (!parsed.extraHidden || !parsed.extraOpen || !parsed.extraClosed) problems.push('variation panel did not open and close');
   if (parsed.artistCount < 40) problems.push('artist list: ' + parsed.artistCount);
