@@ -1,8 +1,8 @@
-# PromptForge
+# Decevr's PromptForge
 
 Desktop app for writing ComfyUI prompts. Type a word or paste a prompt, pick a local model, and copy a prompt in that model's format.
 
-PromptForge opens its own window. It does not run a website, and prompt text stays on this PC.
+Decevr's PromptForge opens its own window. It does not run a website, and prompt text stays on this PC.
 
 ## Run
 
@@ -11,7 +11,7 @@ npm install
 npm start
 ```
 
-A desktop shortcut named PromptForge points at the same app after the first setup on this machine.
+A desktop shortcut named Decevr's PromptForge points at the same app after the first setup on this machine.
 
 ## What it does
 
@@ -48,4 +48,4 @@ npm run check
 
 ## Pack
 
-`npm run pack` writes two files in `release`. `PromptForge Setup 0.1.0.exe` is the installer. It adds a Start menu shortcut, a desktop shortcut, and an uninstaller, and it lets the person choose the folder. `PromptForge.exe` is the portable app.
+`npm run pack` writes two files in `release`. `Decevr's PromptForge Setup 0.1.0.exe` is the installer. It adds a Start menu shortcut, a desktop shortcut, and an uninstaller, and it lets the person choose the folder. `Decevr's PromptForge.exe` is the portable app.

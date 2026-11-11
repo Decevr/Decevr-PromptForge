@@ -1,9 +1,9 @@
 {
   "name": "promptforge",
-  "productName": "PromptForge",
+  "productName": "Decevr's PromptForge",
   "version": "0.1.0",
   "private": true,
-  "description": "Desktop prompt helper for local ComfyUI image and video models.",
+  "description": "Decevr's PromptForge is a desktop prompt helper for local ComfyUI image and video models.",
   "author": "Decevr",
   "main": "electron/main.js",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "build": {
     "appId": "com.decevr.promptforge",
-    "productName": "PromptForge",
+    "productName": "Decevr's PromptForge",
     "directories": {
       "output": "release"
     },
@@ -35,12 +35,12 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "PromptForge",
-      "uninstallDisplayName": "PromptForge",
-      "artifactName": "PromptForge Setup ${version}.exe"
+      "shortcutName": "Decevr's PromptForge",
+      "uninstallDisplayName": "Decevr's PromptForge",
+      "artifactName": "Decevr's PromptForge Setup ${version}.exe"
     },
     "portable": {
-      "artifactName": "PromptForge.exe"
+      "artifactName": "Decevr's PromptForge.exe"
     }
   },
   "devDependencies": {
