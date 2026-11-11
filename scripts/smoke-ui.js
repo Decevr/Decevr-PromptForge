@@ -31,6 +31,8 @@ app.whenReady().then(async () => {
     const label = document.getElementById('model-button-label').textContent;
     const settings = document.querySelector('.settings')?.textContent || '';
     const title = document.querySelector('h1')?.textContent || '';
+    const decevr = document.querySelector('.decevr')?.textContent || '';
+    const windowTitle = document.title;
     const credit = document.querySelector('.credit')?.textContent || '';
     document.getElementById('characters-open').click();
     const charOpen = document.getElementById('character-modal').hidden === false;
@@ -60,7 +62,7 @@ app.whenReady().then(async () => {
     const hairAdded = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'danbooru').prompts[0];
     const hairSkipped = window.PromptForgeExtras.apply(['close-up'], 'blonde hair', 'danbooru').prompts[0];
     document.getElementById('extra-hair').value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, hairAdded, hairSkipped });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, hairAdded, hairSkipped });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -72,6 +74,8 @@ app.whenReady().then(async () => {
   if (!parsed.settings.includes('CFG')) problems.push('settings missing');
   if (parsed.cards < 5) problems.push('expected variations, got ' + parsed.cards);
   if (parsed.title !== 'PromptForge') problems.push('wordmark: ' + parsed.title);
+  if (parsed.decevr !== 'Decevr') problems.push('decevr plate: ' + parsed.decevr);
+  if (parsed.windowTitle !== 'Decevr PromptForge') problems.push('window title: ' + parsed.windowTitle);
   if (parsed.credit !== 'Decevr Co.') problems.push('credit: ' + parsed.credit);
   if (parsed.spellMisses !== 2) problems.push('spellcheck marks: ' + parsed.spellMisses);
   if (!/beuatiful → beautiful/.test(parsed.spellHint)) problems.push('spellcheck hint: ' + parsed.spellHint);

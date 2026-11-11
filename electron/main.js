@@ -29,7 +29,7 @@ function createWindow() {
     minHeight: 680,
     backgroundColor: '#101114',
     autoHideMenuBar: true,
-    title: 'PromptForge',
+    title: 'Decevr PromptForge',
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
