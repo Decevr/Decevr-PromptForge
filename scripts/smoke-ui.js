@@ -48,8 +48,10 @@ app.whenReady().then(async () => {
     const selectedText = document.getElementById('selected-character-list')?.textContent || '';
     const angleCount = document.querySelectorAll('#angle-list button').length;
     const lensCount = document.querySelectorAll('#lens-list button').length;
+    const stealthCount = document.querySelectorAll('#stealth-list button').length;
+    const stealthLabel = [...document.querySelectorAll('#stealth-list button')].some((button) => button.textContent === 'Stealth masturbation');
     const hintMoved = !document.querySelector('.toggles #format-hint') && !!document.querySelector('.status-bar #format-hint');
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, negative, tools, selectedText, angleCount, lensCount, hintMoved });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -72,6 +74,8 @@ app.whenReady().then(async () => {
   if (parsed.selectedText !== 'No characters selected') problems.push('selected characters: ' + parsed.selectedText);
   if (parsed.angleCount < 30) problems.push('angle count: ' + parsed.angleCount);
   if (parsed.lensCount < 25) problems.push('lens count: ' + parsed.lensCount);
+  if (parsed.stealthCount < 12) problems.push('stealth count: ' + parsed.stealthCount);
+  if (!parsed.stealthLabel) problems.push('stealth masturbation button missing');
   if (!parsed.hintMoved) problems.push('format hint still in the toggle row');
   if (problems.length) {
     console.error(problems.join('\n'));

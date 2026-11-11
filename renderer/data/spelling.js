@@ -115,6 +115,9 @@
     'firelight', 'embers', 'smoke', 'dust', 'particles', 'wink', 'gaze', 'profile',
     'seductive', 'confident', 'freckled', 'porcelain', 'sunlit', 'overcast', 'foggy',
     'misty', 'rainy', 'snowy', 'windy', 'looking', 'sparkling', 'detailed', 'beautiful',
+    'stealth', 'masturbating', 'masturbation', 'discreet', 'discreetly', 'fingering',
+    'clothed', 'clothes', 'thigh', 'thighs', 'climax', 'orgasm', 'stroking', 'tabletop', 'waist',
+    'legs', 'windows', 'call', 'place', 'adults',
   ];
 
   const KEEP = [

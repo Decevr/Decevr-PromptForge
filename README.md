@@ -24,7 +24,7 @@ A desktop shortcut named PromptForge points at the same app after the first setu
 - Character templates can save a random female or male adult from the Characters panel
 - Quality tags and negative prompt toggles
 - Character templates: save a description (age, gender, race, hair, eyes, face, makeup, nails, skin, body, breasts, ass, vagina, penis, clothing, style) and insert it in the current format
-- Camera angles and lenses: insert the angle or lens in natural language or tags
+- Camera angles, lenses, and stealth shots: insert the angle, lens, or stealth scene in natural language or tags. Stealth shots describe an adult act and do not name a camera
 - Negative builder: category checkboxes, custom tags, and saved presets, merged into the model negative
 - More variations: another set from the same prompt, with a different light and framing
 - Searchable history

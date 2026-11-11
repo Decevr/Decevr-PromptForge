@@ -54,6 +54,24 @@
     { label: 'Lower body shot', natural: 'lower body shot', tag: 'lower body' },
   ];
 
+  const STEALTH = [
+    { label: 'Stealth masturbation', natural: 'an adult masturbating discreetly, clothes still on, one hand hidden in the lap, face kept calm', tag: 'adult, stealth_masturbation, clothed, hand in lap, calm face' },
+    { label: 'Hand under clothes', natural: 'an adult with one hand slipped under the clothes, the hand covered, expression kept steady', tag: 'adult, hand under clothes, clothed masturbation, steady expression' },
+    { label: 'Under the table', natural: 'an adult seated at a table, hand working out of sight beneath the tabletop, face composed', tag: 'adult, seated, under table, hand out of sight, composed face' },
+    { label: 'Legs crossed', natural: 'an adult seated with legs crossed tight, one hand hidden between the thighs, staying quiet', tag: 'adult, legs crossed, hand between thighs, quiet' },
+    { label: 'Covering the mouth', natural: 'an adult covering the mouth with one hand, the other hand hidden, holding back a sound', tag: 'adult, covering mouth, hand hidden, holding back a sound' },
+    { label: 'Straight face', natural: 'an adult keeping a straight face, only a small movement in the lap giving it away', tag: 'adult, straight face, hidden hand, lap' },
+    { label: 'In the car', natural: 'an adult low in a car seat, windows up, one hand hidden, trying not to be noticed', tag: 'adult, in car, seated, hand hidden' },
+    { label: 'In a crowd', natural: 'an adult standing in a crowd, clothes on, one hand hidden at the hip, nobody looking', tag: 'adult, standing, crowd, clothed, hand hidden' },
+    { label: 'Behind the counter', natural: 'an adult standing behind a counter, waist hidden by the counter, one hand below the counter', tag: 'adult, behind counter, hand below counter' },
+    { label: 'On a call', natural: 'an adult on a phone call, voice steady, free hand hidden in the lap', tag: 'adult, on phone, hand in lap, steady voice' },
+    { label: 'Stealth fingering', natural: 'an adult woman fingering discreetly, fingers hidden under the hem, clothes mostly in place', tag: 'adult, woman, fingering, fingers under clothes, clothed' },
+    { label: 'Discreet stroking', natural: 'an adult man stroking discreetly, hand hidden inside the clothes, face kept calm', tag: 'adult, man, stroking, hand in clothes, calm face' },
+    { label: 'Quiet climax', natural: 'an adult at a quiet climax, lip bitten, thighs pressed together, trying not to show it', tag: 'adult, quiet orgasm, biting lip, thighs together' },
+    { label: 'Hand under a coat', natural: 'an adult with one hand hidden under a coat across the lap, clothes still on', tag: 'adult, hand under coat, lap, clothed' },
+    { label: 'Two adults, quiet', natural: 'two adults staying quiet together, clothes barely shifted, both aware, trying not to be noticed', tag: 'adult, quiet, clothed, both aware' },
+  ];
+
   const LENSES = [
     { label: '24mm wide', natural: '24mm lens, wide angle', tag: '24mm, wide angle' },
     { label: '35mm', natural: '35mm lens', tag: '35mm' },
@@ -114,11 +132,12 @@
     modal.hidden = true;
     modal.innerHTML = [
       '<div class="character-dialog" role="dialog" aria-labelledby="camera-title">',
-      '<div class="character-head"><h2 id="camera-title">Camera Angles & Lenses</h2>',
+      '<div class="character-head"><h2 id="camera-title">Camera Angles, Lenses & Stealth</h2>',
       '<button type="button" class="text-btn" id="camera-close">Close</button></div>',
-      '<div class="character-body character-split">',
+      '<div class="character-body character-split camera-split">',
       '<div class="pane"><h3>Angles</h3><div id="angle-list" class="choice-list"></div></div>',
       '<div class="pane"><h3>Lenses</h3><div id="lens-list" class="choice-list"></div></div>',
+      '<div class="pane"><h3>Stealth</h3><div id="stealth-list" class="choice-list"></div></div>',
       '</div></div>',
     ].join('');
     document.body.appendChild(modal);
@@ -129,6 +148,7 @@
     const modal = createModal();
     const angleList = document.getElementById('angle-list');
     const lensList = document.getElementById('lens-list');
+    const stealthList = document.getElementById('stealth-list');
 
     function renderButtons(container, items, type) {
       container.innerHTML = items.map(function (item, index) {
@@ -138,6 +158,7 @@
 
     renderButtons(angleList, ANGLES, 'angle');
     renderButtons(lensList, LENSES, 'lens');
+    renderButtons(stealthList, STEALTH, 'stealth');
 
     function insertText(text) {
       const input = document.getElementById('prompt-input');
@@ -157,7 +178,8 @@
       if (!button) return;
       const type = button.getAttribute('data-type');
       const index = Number(button.getAttribute('data-index'));
-      const item = type === 'angle' ? ANGLES[index] : LENSES[index];
+      const lists = { angle: ANGLES, lens: LENSES, stealth: STEALTH };
+      const item = lists[type] && lists[type][index];
       if (!item) return;
       const format = activeFormat();
       insertText(format === 'natural' ? item.natural : item.tag);
