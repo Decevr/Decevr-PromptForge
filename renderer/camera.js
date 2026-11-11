@@ -50,6 +50,8 @@
     { label: 'From the closet', natural: 'shot from inside a closet', tag: 'from closet' },
     { label: 'Mirror reflection', natural: 'seen in a mirror reflection', tag: 'mirror reflection' },
     { label: 'From the floor', natural: 'camera on the floor, looking up', tag: 'from the floor' },
+    { label: 'POV across table', natural: 'point of view across the table', tag: 'pov across table' },
+    { label: 'Lower body shot', natural: 'lower body shot', tag: 'lower body' },
   ];
 
   const LENSES = [
