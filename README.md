@@ -26,7 +26,7 @@ A desktop shortcut named PromptForge points at the same app after the first setu
 - Character templates: save a description (age, gender, race, hair, eyes, face, lips, makeup, nails, skin, freckles, moles, scars, birthmarks, piercings, tattoos, body, breasts, nipple color, ass, hips, waist, stomach, thighs, shoulders, back, arms, hands, feet, vagina, penis, pubic hair, clothing, style) and insert it in the current format
 - Camera angles, lenses, and stealth shots: insert the angle, lens, or stealth scene in natural language or tags. Stealth shots describe an adult act and do not name a camera
 - Negative builder: category checkboxes, custom tags, and saved presets, merged into the model negative
-- More variations: another set from the same prompt, with a different light and framing
+- More variations: another set from the same prompt, with a different light and framing. Dropdowns under that button add a hairstyle, expression, background, scenery, action, wardrobe, pose, sexual pose, or sex scene only when one is selected and that idea is not already in the typed prompt
 - Searchable history
 - Copy on every prompt, Copy All, and selectable prompt text
 - Weight helper: select text, then apply `(tag:1.2)`

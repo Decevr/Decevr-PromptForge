@@ -405,6 +405,38 @@ textarea:focus, select:focus, .combo-button:focus, .combo-panel input:focus, .pr
   color: #1a140c;
 }
 
+.extra-bar {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  padding: 12px 28px 0;
+}
+
+.extra-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 148px;
+  flex: 1 1 148px;
+}
+
+.extra-field span {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e0b56a;
+}
+
+.extra-field select {
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e0b56a;
+  background: #1a1814;
+  color: #f7f4ee;
+  padding: 0 8px;
+}
+
 .toggles {
   flex: none;
   display: flex;

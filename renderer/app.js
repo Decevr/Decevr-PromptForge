@@ -308,6 +308,11 @@
       negativeExtra: state.negativeExtra,
       variationOffset: variationOffset || 0,
     });
+    if (window.PromptForgeExtras && output && output.prompts) {
+      const extra = window.PromptForgeExtras.apply(output.prompts, els.input.value, output.format);
+      output.prompts = extra.prompts;
+      output.notes = (output.notes || []).concat(extra.notes || []);
+    }
     if (output.error) {
       els.error.hidden = false;
       els.error.textContent = output.error;

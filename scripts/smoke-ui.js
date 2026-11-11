@@ -55,7 +55,12 @@ app.whenReady().then(async () => {
     const stealthCount = document.querySelectorAll('#stealth-list button').length;
     const stealthLabel = [...document.querySelectorAll('#stealth-list button')].some((button) => button.textContent === 'Stealth masturbation');
     const hintMoved = !document.querySelector('.toggles #format-hint') && !!document.querySelector('.status-bar #format-hint');
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved });
+    const extraCount = document.querySelectorAll('#extra-bar select').length;
+    document.getElementById('extra-hair').value = 'long wavy hair';
+    const hairAdded = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'danbooru').prompts[0];
+    const hairSkipped = window.PromptForgeExtras.apply(['close-up'], 'blonde hair', 'danbooru').prompts[0];
+    document.getElementById('extra-hair').value = '';
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, hairAdded, hairSkipped });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -82,6 +87,9 @@ app.whenReady().then(async () => {
   if (parsed.lensCount < 25) problems.push('lens count: ' + parsed.lensCount);
   if (parsed.stealthCount < 12) problems.push('stealth count: ' + parsed.stealthCount);
   if (!parsed.stealthLabel) problems.push('stealth masturbation button missing');
+  if (parsed.extraCount < 9) problems.push('variation menus: ' + parsed.extraCount);
+  if (!/long_wavy_hair/.test(parsed.hairAdded)) problems.push('hairstyle was not added: ' + parsed.hairAdded);
+  if (/long_wavy_hair/.test(parsed.hairSkipped)) problems.push('hairstyle replaced typed hair: ' + parsed.hairSkipped);
   if (!parsed.hintMoved) problems.push('format hint still in the toggle row');
   if (problems.length) {
     console.error(problems.join('\n'));
