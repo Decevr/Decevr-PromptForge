@@ -703,6 +703,47 @@
     return words.length ? [raw].concat(words) : [raw];
   }
 
+  function cleanDetail(text) {
+    return String(text || '').replace(/[,_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function readDetail(menuId) {
+    const color = document.getElementById('extra-' + menuId + '-color');
+    const pattern = document.getElementById('extra-' + menuId + '-pattern');
+    return {
+      color: color ? cleanDetail(color.value) : '',
+      pattern: pattern ? cleanDetail(pattern.value) : '',
+    };
+  }
+
+  function articleFor(word) {
+    return /^[aeiou]/i.test(String(word || '').trim()) ? 'an' : 'a';
+  }
+
+  function paintClothing(phrase, color, pattern, already) {
+    if (/^(fully nude|topless|bottomless|naked)\b/i.test(String(phrase || '').trim())) return phrase;
+    const bits = [];
+    [color, pattern].forEach(function (word) {
+      const clean = cleanDetail(word);
+      if (!clean) return;
+      if (already && already(clean)) return;
+      if (hasAny(phrase, [clean])) return;
+      bits.push(clean);
+    });
+    if (!bits.length) return phrase;
+    const extra = bits.join(' ');
+    const article = articleFor(bits[0]);
+    let match = phrase.match(/^(wearing only )(a|an) (.+)$/i);
+    if (match) return match[1] + article + ' ' + extra + ' ' + match[3];
+    match = phrase.match(/^(wearing )(a|an) (.+)$/i);
+    if (match) return match[1] + article + ' ' + extra + ' ' + match[3];
+    match = phrase.match(/^(wearing )(.+)$/i);
+    if (match) return match[1] + extra + ' ' + match[2];
+    match = phrase.match(/^(a|an) (.+)$/i);
+    if (match) return article + ' ' + extra + ' ' + match[2];
+    return extra + ' ' + phrase;
+  }
+
   function selectedAdds(input, category) {
     const adds = [];
     MENUS.forEach(function (menu) {
@@ -714,12 +755,17 @@
       const tag = option && option[2] ? option[2] : '';
       const keys = keysFor(menu, phrase, tag);
       if (hasAny(input, keys)) return;
+      const clothing = menu.id === 'wardrobe' || menu.id === 'lingerie';
+      const detail = clothing ? readDetail(menu.id) : { color: '', pattern: '' };
       adds.push({
         id: menu.id,
         label: menu.label,
         keys: keys,
         text: phrase,
         tag: tag,
+        clothing: clothing,
+        color: detail.color,
+        pattern: detail.pattern,
       });
     });
     return adds;
@@ -740,7 +786,12 @@
       const parts = [];
       adds.forEach(function (add) {
         if (hasAny(prompt, add.keys)) return;
-        parts.push(renderAdd(add, format));
+        const text = add.clothing
+          ? paintClothing(add.text, add.color, add.pattern, function (word) {
+            return hasAny(String(input || '') + '\n' + String(prompt || ''), [word]);
+          })
+          : add.text;
+        parts.push(renderAdd({ text: text, tag: add.tag }, format));
         used[add.label] = true;
       });
       if (!parts.length) return prompt;
@@ -769,7 +820,15 @@
     });
     if (group) options.push('</optgroup>');
     const hint = menu.videoOnly ? ' title="Added only for video models"' : '';
-    return '<label class="extra-field"' + hint + '><span>' + escapeHtml(menu.label) + '</span><select id="extra-' + menu.id + '">' + options.join('') + '</select></label>';
+    const field = '<label class="extra-field"' + hint + '><span>' + escapeHtml(menu.label) + '</span><select id="extra-' + menu.id + '">' + options.join('') + '</select></label>';
+    if (menu.id !== 'wardrobe' && menu.id !== 'lingerie') return field;
+    return '<div class="extra-clothing">' + field + renderDetail(menu.id, 'Color', saved) + renderDetail(menu.id, 'Pattern', saved) + '</div>';
+  }
+
+  function renderDetail(menuId, label, saved) {
+    const kind = label.toLowerCase();
+    const value = saved[menuId + label] || '';
+    return '<label class="extra-field extra-detail"><span>' + escapeHtml(label) + '</span><input type="text" id="extra-' + menuId + '-' + kind + '" value="' + escapeHtml(value) + '" placeholder="Type a ' + kind + '" autocomplete="off" spellcheck="false"></label>';
   }
 
   function init() {
@@ -783,7 +842,7 @@
       '<div class="character-dialog" role="dialog" aria-labelledby="extra-title">',
       '<div class="character-head"><h2 id="extra-title">More variations</h2>',
       '<button type="button" class="text-btn" id="extra-close">Close</button></div>',
-      '<p class="extra-note">A choice is added when you generate, and only when that idea is not already in the prompt you typed. Motion is added only for a video model.</p>',
+      '<p class="extra-note">A choice is added when you generate, and only when that idea is not already in the prompt you typed. Color and pattern are typed beside Wardrobe and Lingerie and added to that clothing only. Motion is added only for a video model.</p>',
       '<div id="extra-bar" class="extra-bar">',
       MENUS.map(function (menu) { return renderMenu(menu, saved); }).join(''),
       '</div>',
@@ -800,14 +859,21 @@
       if (!input || !input.value.trim()) return;
       document.dispatchEvent(new CustomEvent('promptforge:more-variations'));
     });
-    modal.addEventListener('change', function () {
+    function persistExtras() {
       const values = {};
       MENUS.forEach(function (menu) {
         const select = document.getElementById('extra-' + menu.id);
         if (select && select.value) values[menu.id] = select.value;
       });
+      ['wardrobe', 'lingerie'].forEach(function (id) {
+        const detail = readDetail(id);
+        if (detail.color) values[id + 'Color'] = detail.color;
+        if (detail.pattern) values[id + 'Pattern'] = detail.pattern;
+      });
       saveSaved(values);
-    });
+    }
+    modal.addEventListener('change', persistExtras);
+    modal.addEventListener('input', persistExtras);
     function open() { modal.hidden = false; }
     window.PromptForgeExtras.open = open;
   }

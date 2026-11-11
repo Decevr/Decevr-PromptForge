@@ -534,14 +534,34 @@ textarea:focus, select:focus, .combo-button:focus, .combo-panel input:focus, .pr
   color: #e0b56a;
 }
 
-.extra-field select {
+.extra-clothing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  flex: 1 1 100%;
+}
+
+.extra-clothing > .extra-field:first-child { flex: 2 1 220px; }
+
+.extra-clothing > .extra-detail {
+  flex: 1 1 140px;
+  min-width: 120px;
+}
+
+.extra-field select,
+.extra-field input {
   height: 36px;
+  width: 100%;
+  box-sizing: border-box;
   border-radius: 8px;
   border: 1px solid #e0b56a;
   background: #1a1814;
   color: #f7f4ee;
   padding: 0 8px;
+  font: inherit;
 }
+
+.extra-field input::placeholder { color: #8a8072; }
 
 .toggles {
   flex: none;
