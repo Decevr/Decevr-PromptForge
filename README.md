@@ -45,3 +45,7 @@ Concept expansions live in `renderer/data/variations.js`. An unknown word still 
 ```powershell
 npm run check
 ```
+
+## Pack
+
+`npm run pack` writes two files in `release`. `PromptForge Setup 0.1.0.exe` is the installer. It adds a Start menu shortcut, a desktop shortcut, and an uninstaller, and it lets the person choose the folder. `PromptForge.exe` is the portable app.

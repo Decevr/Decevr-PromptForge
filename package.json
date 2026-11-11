@@ -10,7 +10,7 @@
     "start": "electron .",
     "check": "node scripts/check-engine.js",
     "smoke": "electron scripts/smoke-ui.js",
-    "pack": "electron-builder --win portable"
+    "pack": "electron-builder --win nsis portable"
   },
   "build": {
     "appId": "com.decevr.promptforge",
@@ -25,8 +25,19 @@
     ],
     "asar": true,
     "win": {
-      "target": ["portable"],
+      "target": ["nsis", "portable"],
       "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PromptForge",
+      "uninstallDisplayName": "PromptForge",
+      "artifactName": "PromptForge Setup ${version}.exe"
     },
     "portable": {
       "artifactName": "PromptForge.exe"
