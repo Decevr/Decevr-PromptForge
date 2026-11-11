@@ -20,6 +20,11 @@ A desktop shortcut named PromptForge points at the same app after the first setu
 - Automatic spelling fixes, then a prompt cleanup: tag order, shorthand, filler, and a light cue when the prompt has none
 - Single-word variations, and paste-to-optimize for a full prompt
 - Quality tags and negative prompt toggles
+- Character templates: save a description (hair, eyes, face, makeup, nails, skin, body, breasts, ass, vagina, penis, clothing, style) and insert it in the current format
+- Camera angles and lenses: insert the angle or lens in natural language or tags
+- Negative builder: category checkboxes, custom tags, and saved presets, merged into the model negative
+- More variations: another set from the same prompt, with a different light and framing
+- Searchable history
 - Copy on every prompt, Copy All, and selectable prompt text
 - Weight helper: select text, then apply `(tag:1.2)`
 - Suggested steps, CFG, and sampler under each result

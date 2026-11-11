@@ -34,6 +34,7 @@
     copyAll: document.getElementById('copy-all'),
     favorites: document.getElementById('favorites-list'),
     history: document.getElementById('history-list'),
+    historySearch: document.getElementById('history-search'),
     clearFavorites: document.getElementById('clear-favorites'),
     clearHistory: document.getElementById('clear-history'),
     exportText: document.getElementById('export-text'),
@@ -53,6 +54,8 @@
     includeNegative: typeof saved.includeNegative === 'boolean'
       ? saved.includeNegative
       : Boolean(models[0] && models[0].negativeDefault),
+    negativeExtra: saved.negativeExtra || '',
+    variationPass: 0,
     query: '',
     highlight: 0,
     open: false,
@@ -84,15 +87,51 @@
 
   els.form.addEventListener('submit', function (event) {
     event.preventDefault();
-    generate();
+    state.variationPass = 0;
+    generate(0);
   });
 
   document.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
       event.preventDefault();
-      generate();
+      state.variationPass = 0;
+      generate(0);
     }
-    if (event.key === 'Escape' && state.open) closeModels();
+    if (event.ctrlKey && event.shiftKey && !event.altKey && window.PromptForgeUI) {
+      const key = event.key.toLowerCase();
+      if (key === 'c') {
+        event.preventDefault();
+        window.PromptForgeUI.openCharacters();
+      } else if (key === 'a') {
+        event.preventDefault();
+        window.PromptForgeUI.openCamera();
+      } else if (key === 'n') {
+        event.preventDefault();
+        window.PromptForgeUI.openNegatives();
+      }
+    }
+    if (event.key === 'Escape') {
+      if (state.open) closeModels();
+      ['character-modal', 'camera-modal', 'negative-modal'].forEach(function (id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.hidden = true;
+      });
+    }
+  });
+
+  document.addEventListener('promptforge:negative', function (event) {
+    state.negativeExtra = (event.detail && event.detail.tags) || '';
+    if (state.negativeExtra) {
+      state.includeNegative = true;
+      els.negative.checked = true;
+    }
+    saveStore();
+  });
+
+  document.addEventListener('promptforge:more-variations', function () {
+    if (!els.input.value.trim()) return;
+    state.variationPass += 1;
+    generate(state.variationPass);
   });
 
   els.modelButton.addEventListener('click', function () {
@@ -139,7 +178,10 @@
     renderSpellcheck();
   });
 
-  els.input.addEventListener('input', renderSpellcheck);
+  els.input.addEventListener('input', function () {
+    state.variationPass = 0;
+    renderSpellcheck();
+  });
   els.input.addEventListener('scroll', function () {
     els.spellLayer.scrollTop = els.input.scrollTop;
     els.spellLayer.scrollLeft = els.input.scrollLeft;
@@ -250,7 +292,7 @@
     }
   }
 
-  function generate() {
+  function generate(variationOffset) {
     const model = currentModel();
     const output = engine.generate({
       input: els.input.value,
@@ -261,6 +303,8 @@
       addQuality: state.addQuality,
       ultraDetailed: state.ultraDetailed,
       includeNegative: state.includeNegative,
+      negativeExtra: state.negativeExtra,
+      variationOffset: variationOffset || 0,
     });
     if (output.error) {
       els.error.hidden = false;
@@ -446,12 +490,26 @@
     }).join('');
   }
 
+  if (els.historySearch) {
+    els.historySearch.addEventListener('input', renderHistory);
+  }
+
   function renderHistory() {
+    const query = els.historySearch ? els.historySearch.value.trim().toLowerCase() : '';
+    const rows = state.history.filter(function (batch) {
+      if (!query) return true;
+      const hay = (batch.modelName + ' ' + batch.input + ' ' + (batch.negative || '')).toLowerCase();
+      return hay.indexOf(query) >= 0;
+    });
     if (!state.history.length) {
       els.history.innerHTML = '<p class="empty">Generations land here.</p>';
       return;
     }
-    els.history.innerHTML = state.history.map(function (batch) {
+    if (!rows.length) {
+      els.history.innerHTML = '<p class="empty">No history matches.</p>';
+      return;
+    }
+    els.history.innerHTML = rows.map(function (batch) {
       const count = batch.prompts.length;
       return '<article class="history-card"><div class="row"><strong>' + escapeHtml(batch.modelName) + '</strong><span>' + escapeHtml(formatTime(batch.at)) + '</span></div><p>' + escapeHtml(clip(batch.input, 80)) + ' · ' + count + ' prompt' + (count === 1 ? '' : 's') + '</p><div class="row" style="margin-top:8px"><button type="button" class="load-btn" data-load="' + batch.id + '">Load</button><button type="button" class="load-btn" data-copy-id="' + batch.id + '" data-which="batch">Copy</button></div></article>';
     }).join('');
@@ -692,6 +750,7 @@
       addQuality: state.addQuality,
       ultraDetailed: state.ultraDetailed,
       includeNegative: state.includeNegative,
+      negativeExtra: state.negativeExtra,
       history: state.history,
       favorites: state.favorites,
     };

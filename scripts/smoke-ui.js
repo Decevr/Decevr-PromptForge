@@ -32,7 +32,20 @@ app.whenReady().then(async () => {
     const settings = document.querySelector('.settings')?.textContent || '';
     const title = document.querySelector('h1')?.textContent || '';
     const credit = document.querySelector('.credit')?.textContent || '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint });
+    document.getElementById('characters-open').click();
+    const charOpen = document.getElementById('character-modal').hidden === false;
+    document.getElementById('char-close').click();
+    const charClosed = document.getElementById('character-modal').hidden === true;
+    document.getElementById('negatives-open').click();
+    document.querySelector('#neg-categories [data-cat="extra"]').checked = true;
+    document.getElementById('neg-apply').click();
+    document.getElementById('prompt-input').value = 'eyes';
+    document.getElementById('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    const negative = document.querySelector('.neg-block')?.textContent || '';
+    const tools = ['Characters', 'Camera', 'Negatives', 'More variations'].filter((name) => {
+      return [...document.querySelectorAll('.toggles button')].some((button) => button.textContent === name);
+    });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, credit, spellMisses, spellHint, charOpen, charClosed, negative, tools });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -49,6 +62,9 @@ app.whenReady().then(async () => {
   if (!/beuatiful → beautiful/.test(parsed.spellHint)) problems.push('spellcheck hint: ' + parsed.spellHint);
   if (!/womna → woman/.test(parsed.spellHint)) problems.push('spellcheck hint: ' + parsed.spellHint);
   if (/post/.test(parsed.spellHint)) problems.push('spellcheck flagged post: ' + parsed.spellHint);
+  if (!parsed.charOpen || !parsed.charClosed) problems.push('character modal did not open and close');
+  if (!/extra people/.test(parsed.negative)) problems.push('custom negative missing: ' + parsed.negative);
+  if (parsed.tools.length !== 4) problems.push('tool buttons: ' + parsed.tools.join(', '));
   if (problems.length) {
     console.error(problems.join('\n'));
     app.exit(1);

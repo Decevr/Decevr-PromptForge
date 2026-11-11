@@ -68,9 +68,10 @@
         input = improved.text;
         improved.notes.forEach(function (note) { notes.push(note); });
       }
+      const variationOffset = Math.max(0, Number(opts.variationOffset) || 0);
       let prompts = mode === 'short'
-        ? expandShort(input, model, format)
-        : optimizeLong(input, model, format);
+        ? expandShort(input, model, format, variationOffset)
+        : optimizeLong(input, model, format, variationOffset);
       if (opts.addQuality) prompts = prompts.map(function (prompt) {
         return applyQuality(prompt, model, format);
       });
@@ -88,7 +89,11 @@
         if (prompts[1] && prompts[1] !== prompts[0]) notes.push('Suggestion 2 changes the lighting');
         if (prompts[2] && prompts[2] !== prompts[0]) notes.push('Suggestion 3 changes the framing');
       }
-      const negative = opts.includeNegative ? (model.negativeTemplate || '') : '';
+      const negative = opts.includeNegative
+        ? mergeNegative(model.negativeTemplate, opts.negativeExtra)
+        : '';
+      if (variationOffset) notes.push('Variation set ' + (variationOffset + 1));
+      if (opts.includeNegative && String(opts.negativeExtra || '').trim()) notes.push('Added custom negative');
       return {
         mode: mode,
         format: format,
@@ -102,18 +107,20 @@
       };
     }
 
-    function expandShort(input, model, format) {
+    function expandShort(input, model, format, offset) {
       const concept = matchConcept(concepts, input);
       const style = model.variationStyle || 'descriptive';
       const source = concept || genericConcept(input);
       const seeds = pickBank(source, style).slice(0, 6);
-      return seeds.map(function (seed) {
+      return seeds.map(function (seed, index) {
         const rendered = renderSeed(seed, input, format);
-        return personalize(rendered, input, concept, format);
+        const prompt = personalize(rendered, input, concept, format);
+        if (!offset) return prompt;
+        return addMoreVariation(prompt, format, index, offset);
       });
     }
 
-    function optimizeLong(input, model, format) {
+    function optimizeLong(input, model, format, offset) {
       const source = detectFormat(input);
       const style = model.variationStyle || 'descriptive';
       let base;
@@ -122,10 +129,11 @@
       } else {
         base = source === 'tags' ? normalizeTags(input, format) : proseToTags(input, format);
       }
+      const skip = offset || 0;
       return [
         base,
-        replaceOrAddCue(base, format, style, 'lighting'),
-        replaceOrAddCue(base, format, style, 'framing'),
+        replaceOrAddCue(base, format, style, 'lighting', skip),
+        replaceOrAddCue(base, format, style, 'framing', skip),
       ];
     }
 
@@ -461,10 +469,49 @@
     return tags.concat(parts).join(', ');
   }
 
-  function replaceOrAddCue(prompt, format, style, kind) {
+  function mergeNegative(template, extra) {
+    const parts = [];
+    const seen = {};
+    function add(text) {
+      String(text || '').split(',').forEach(function (part) {
+        const tag = part.trim();
+        if (!tag) return;
+        const key = tag.toLowerCase().replace(/_/g, ' ');
+        if (seen[key]) return;
+        seen[key] = true;
+        parts.push(tag);
+      });
+    }
+    add(template);
+    add(extra);
+    return parts.join(', ');
+  }
+
+  const MORE_LIGHT = ['golden hour', 'cool rim light', 'studio lighting', 'moonlight', 'neon lighting'];
+  const MORE_FRAME = ['low angle', 'from side', 'dutch angle', 'full body', 'over shoulder'];
+
+  function addMoreVariation(prompt, format, index, offset) {
+    const light = MORE_LIGHT[(index + offset) % MORE_LIGHT.length];
+    const frame = MORE_FRAME[(index + offset) % MORE_FRAME.length];
+    return appendCue(appendCue(prompt, format, light), format, frame);
+  }
+
+  function appendCue(prompt, format, phrase) {
+    if (hasPhrase(prompt, phrase)) return prompt;
+    if (format === 'natural') {
+      const trimmed = String(prompt || '').replace(/\s+$/, '');
+      const punct = /[.!?]$/.test(trimmed) ? trimmed.slice(-1) : '';
+      const body = (punct ? trimmed.slice(0, -1) : trimmed).replace(/[,\s]+$/, '');
+      return body + ', ' + phrase + punct;
+    }
+    return prompt + ', ' + formatTagToken(phrase, format);
+  }
+
+  function replaceOrAddCue(prompt, format, style, kind, skip) {
     const group = CUES[kind][style] || CUES[kind].descriptive;
     const present = group.find(function (cue) { return hasPhrase(prompt, cue); });
-    const next = group.find(function (cue) { return cue !== present && !hasPhrase(prompt, cue); });
+    const options = group.filter(function (cue) { return cue !== present && !hasPhrase(prompt, cue); });
+    const next = options.length ? options[(skip || 0) % options.length] : null;
     if (!next) return prompt;
     if (present) {
       const swapped = swapPhrase(prompt, present, next, format);

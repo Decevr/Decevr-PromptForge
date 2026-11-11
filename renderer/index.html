@@ -67,7 +67,7 @@
       <label class="check"><input id="ultra-toggle" type="checkbox" /> Ultra detailed</label>
       <label class="check"><input id="negative-toggle" type="checkbox" /> Negative</label>
       <p class="hint" id="format-hint"></p>
-      <p class="kbd">Ctrl+Enter. Select any prompt text to copy it yourself.</p>
+      <p class="kbd">Ctrl+Enter generates. Ctrl+Shift+C characters, Ctrl+Shift+A camera, Ctrl+Shift+N negatives.</p>
     </div>
 
     <section class="stage">
@@ -98,6 +98,7 @@
               <button type="button" class="text-btn" id="clear-history">Clear</button>
             </div>
           </div>
+          <input id="history-search" type="search" placeholder="Search history" autocomplete="off" />
           <div id="history-list" class="history-list"></div>
         </div>
       </div>
@@ -112,5 +113,9 @@
   <script src="data/spelling.js"></script>
   <script src="engine.js"></script>
   <script src="app.js"></script>
+  <script src="characters.js"></script>
+  <script src="camera.js"></script>
+  <script src="negatives.js"></script>
+  <script src="variations.js"></script>
 </body>
 </html>

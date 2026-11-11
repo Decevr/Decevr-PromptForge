@@ -214,6 +214,31 @@ const plain = engine.generate({
 });
 assert(!/ultra detailed/i.test(plain.prompts[0]), 'ultra detailed stays off unless asked');
 
+const customNeg = engine.generate({
+  input: 'eyes',
+  model: illus,
+  formatOverride: 'auto',
+  addQuality: false,
+  includeNegative: true,
+  negativeExtra: 'watermark, extra people, blurry',
+});
+assert(customNeg.negative.includes('extra people'), 'custom negative tags are added');
+assert(customNeg.negative.includes('bad hands'), 'model negative stays');
+assert((customNeg.negative.match(/watermark/gi) || []).length === 1, 'duplicate negative tags are removed');
+assert(customNeg.notes.some((note) => /custom negative/i.test(note)), 'custom negative is noted');
+
+const more = engine.generate({
+  input: 'eyes',
+  model: illus,
+  formatOverride: 'auto',
+  addQuality: true,
+  includeNegative: false,
+  variationOffset: 1,
+});
+assert(more.prompts[0] !== eyes.prompts[0], 'another variation set changes the first prompt');
+assert(/golden hour|cool rim light|studio lighting|moonlight|neon/i.test(more.prompts.join(' ')), 'another set adds a new light cue');
+assert(more.notes.some((note) => /Variation set 2/.test(note)), 'variation set is noted');
+
 if (failed) {
   console.error(failed + ' check(s) failed');
   process.exit(1);
