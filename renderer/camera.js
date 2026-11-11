@@ -35,6 +35,21 @@
     { label: 'Looking back', natural: 'looking back over the shoulder', tag: 'looking back' },
     { label: 'Crane', natural: 'crane shot', tag: 'crane shot' },
     { label: 'Dolly in', natural: 'dolly in', tag: 'dolly in' },
+    { label: 'Under desk', natural: 'shot from under the desk', tag: 'from under desk' },
+    { label: 'Under seat', natural: 'shot from under the seat', tag: 'from under seat' },
+    { label: 'Under table', natural: 'shot from under the table', tag: 'from under table' },
+    { label: 'Security camera', natural: 'security camera view, high corner angle', tag: 'security camera' },
+    { label: 'Ceiling camera', natural: 'ceiling-mounted camera, looking down', tag: 'ceiling camera' },
+    { label: 'Corner camera', natural: 'corner camera, wide surveillance view', tag: 'corner camera' },
+    { label: 'Dashcam', natural: 'dashboard camera view', tag: 'dashcam' },
+    { label: 'Bodycam', natural: 'bodycam point of view', tag: 'bodycam' },
+    { label: 'Through a doorway', natural: 'shot through a doorway', tag: 'through doorway' },
+    { label: 'Around a corner', natural: 'shot from around a corner', tag: 'around corner' },
+    { label: 'Through blinds', natural: 'shot through window blinds', tag: 'through blinds' },
+    { label: 'Keyhole', natural: 'shot through a keyhole', tag: 'keyhole' },
+    { label: 'From the closet', natural: 'shot from inside a closet', tag: 'from closet' },
+    { label: 'Mirror reflection', natural: 'seen in a mirror reflection', tag: 'mirror reflection' },
+    { label: 'From the floor', natural: 'camera on the floor, looking up', tag: 'from the floor' },
   ];
 
   const LENSES = [
