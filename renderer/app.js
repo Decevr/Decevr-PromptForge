@@ -66,6 +66,7 @@
     mode: '',
     notes: [],
     ultraIndex: -1,
+    randomIndex: -1,
     history: saved.history || [],
     favorites: saved.favorites || [],
     activeHistoryId: null,
@@ -319,6 +320,7 @@
     state.formatUsed = output.format;
     state.notes = output.notes || [];
     state.ultraIndex = typeof output.ultraIndex === 'number' ? output.ultraIndex : -1;
+    state.randomIndex = typeof output.randomIndex === 'number' ? output.randomIndex : -1;
     state.settingsLine = output.settingsLine;
     state.negative = output.negative;
     state.results = output.prompts.map(function (prompt, index) {
@@ -337,6 +339,7 @@
       format: output.format,
       notes: state.notes,
       ultraIndex: state.ultraIndex,
+      randomIndex: state.randomIndex,
       addQuality: state.addQuality,
       ultraDetailed: state.ultraDetailed,
       includeNegative: state.includeNegative,
@@ -392,6 +395,7 @@
   }
 
   function resultLabel(index) {
+    if (index === state.randomIndex) return 'Random prompt creation';
     if (index === state.ultraIndex) return 'Ultra variation';
     if (state.mode === 'short') return 'Variation ' + (index + 1);
     if (!state.improvePrompt) return index === 0 ? 'Optimized' : 'Alternate ' + index;
@@ -531,6 +535,7 @@
     state.includeNegative = batch.includeNegative;
     state.notes = batch.notes || [];
     state.ultraIndex = typeof batch.ultraIndex === 'number' ? batch.ultraIndex : -1;
+    state.randomIndex = typeof batch.randomIndex === 'number' ? batch.randomIndex : -1;
     els.format.value = state.formatOverride;
     els.quality.checked = state.addQuality;
     els.ultra.checked = state.ultraDetailed;

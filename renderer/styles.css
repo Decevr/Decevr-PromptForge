@@ -624,6 +624,28 @@ h2 {
 
 .character-head h2, .character-form h3, .pane h3 { margin: 0; }
 
+.character-random {
+  margin-bottom: 8px;
+  padding: 12px;
+  border: 1px solid #e0b56a;
+  border-radius: 10px;
+  background: rgba(224, 181, 106, 0.08);
+}
+
+.character-random h3 { margin: 0 0 6px; }
+.character-random .character-actions { margin-top: 8px; }
+
+.character-random {
+  margin-bottom: 8px;
+  padding: 12px;
+  border: 1px solid #e0b56a;
+  border-radius: 10px;
+  background: rgba(224, 181, 106, 0.08);
+}
+
+.character-random h3 { margin: 0 0 6px; }
+.character-random .character-actions { margin-top: 8px; }
+
 .character-body {
   display: grid;
   grid-template-columns: 280px 1fr;

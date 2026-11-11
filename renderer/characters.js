@@ -87,6 +87,13 @@
       '<div class="character-body">',
       '<div class="character-list" id="character-list"></div>',
       '<form class="character-form" id="character-form">',
+      '<div class="character-random">',
+      '<h3>Random character</h3>',
+      '<p class="hint">Creates an adult, 21 or older, and saves them to the list.</p>',
+      '<div class="character-actions">',
+      '<button type="button" class="generate" id="char-random-female">Random female</button>',
+      '<button type="button" class="generate" id="char-random-male">Random male</button>',
+      '</div></div>',
       '<h3 id="char-form-title">New character</h3>',
       FIELDS.map(function (field) {
         const placeholder = field.key === 'age' ? ' placeholder="25"' : '';
@@ -149,6 +156,58 @@
       listEl.innerHTML = chars.map(function (char) {
         return '<article class="history-card"><div class="row"><strong>' + escapeHtml(char.name || 'Unnamed') + '</strong></div><div class="row" style="margin-top:8px"><button type="button" class="load-btn" data-insert="' + escapeHtml(char.id) + '">Insert</button><button type="button" class="load-btn" data-edit="' + escapeHtml(char.id) + '">Edit</button><button type="button" class="load-btn" data-delete="' + escapeHtml(char.id) + '">Delete</button></div></article>';
       }).join('');
+    }
+
+    function pickOne(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function rollCharacter(kind) {
+      const female = kind === 'female';
+      const names = female
+        ? ['Elena', 'Mira', 'Naomi', 'Sofia', 'Hana', 'Ingrid', 'Amara', 'Lila', 'Celeste', 'Nora']
+        : ['Adrian', 'Marcus', 'Kenji', 'Elias', 'Omar', 'Leo', 'Julian', 'Andre', 'Soren', 'Malik'];
+      const races = female
+        ? ['East Asian', 'Black', 'White', 'Latina', 'South Asian', 'Middle Eastern', 'mixed']
+        : ['East Asian', 'Black', 'White', 'Latino', 'South Asian', 'Middle Eastern', 'mixed'];
+      const hair = pickOne(['long', 'short', 'wavy', 'straight']) + ' ' + pickOne(['black', 'brown', 'blonde', 'red', 'silver', 'auburn']) + ' hair';
+      const eyes = pickOne(['blue', 'green', 'brown', 'amber', 'gray', 'hazel']) + ' eyes';
+      const skin = pickOne(['fair', 'tan', 'brown', 'deep brown', 'olive']);
+      const age = String(pickOne([21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 35]));
+      return {
+        name: pickOne(names),
+        age: age,
+        gender: female ? 'female' : 'male',
+        race: pickOne(races),
+        hair: hair,
+        eyes: eyes,
+        face: pickOne(female
+          ? ['soft features', 'sharp features', 'freckles', 'defined cheekbones']
+          : ['sharp jaw', 'soft features', 'light stubble', 'defined cheekbones']),
+        makeup: female ? pickOne(['natural makeup', 'red lipstick', 'no makeup', 'smoky eyes']) : '',
+        nails: female ? pickOne(['red nails', 'nude nails', 'black nails']) : '',
+        skin: skin + ' skin',
+        body: pickOne(female ? ['slim', 'athletic', 'curvy', 'hourglass'] : ['lean', 'athletic', 'broad', 'tall']),
+        breasts: female ? pickOne(['small breasts', 'medium breasts', 'large breasts']) : '',
+        ass: pickOne(['toned ass', 'round ass', 'full ass']),
+        vagina: female ? pickOne(['shaved', 'natural']) : '',
+        penis: female ? '' : pickOne(['average penis', 'large penis']),
+        otherBody: '',
+        clothing: pickOne(female
+          ? ['red dress', 'black coat', 'silk gown', 'white blouse']
+          : ['black coat', 'dark suit', 'white shirt', 'leather jacket']),
+        style: pickOne(['anime', 'semi-realistic', 'photoreal']),
+      };
+    }
+
+    function saveRandom(kind) {
+      const data = rollCharacter(kind);
+      data.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      const chars = load();
+      chars.unshift(data);
+      save(chars);
+      renderList();
+      fillForm(data);
     }
 
     function fillForm(char) {
@@ -229,6 +288,8 @@
     });
 
     document.getElementById('char-new').addEventListener('click', function () { fillForm(null); });
+    document.getElementById('char-random-female').addEventListener('click', function () { saveRandom('female'); });
+    document.getElementById('char-random-male').addEventListener('click', function () { saveRandom('male'); });
     document.getElementById('char-close').addEventListener('click', function () { modal.hidden = true; });
     modal.addEventListener('click', function (event) {
       if (event.target === modal) modal.hidden = true;

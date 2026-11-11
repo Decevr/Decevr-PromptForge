@@ -273,6 +273,45 @@ const tagForest = engine.generate({
 assert(/moonlight_through_the_trees/.test(tagForest.prompts[tagForest.ultraIndex]), 'tag ultra variation uses underscores');
 assert(tagForest.prompts[0].startsWith('masterpiece'), 'quality tags still lead the cleaned card');
 
+const randomGirl = engine.generate({
+  input: '1girl',
+  model: illus,
+  formatOverride: 'auto',
+  addQuality: true,
+  includeNegative: false,
+  randomSeed: 2,
+});
+const randomCard = randomGirl.prompts[randomGirl.randomIndex];
+assert(randomGirl.randomIndex >= 0, 'random prompt creation has a card');
+assert(/1girl/.test(randomCard), 'random card keeps 1girl');
+assert(/\b(2[1-9]|3[0-5])_years_old\b/.test(randomCard), 'random card states an adult age');
+assert(!/loli|teen|child|schoolgirl|underage/i.test(randomCard), 'random card stays adult');
+assert(randomGirl.notes.some((note) => /Random prompt creation/.test(note)), 'random prompt creation is noted');
+
+const lockedEyes = engine.generate({
+  input: '1girl, blue eyes, forest',
+  model: illus,
+  formatOverride: 'auto',
+  addQuality: false,
+  includeNegative: false,
+  randomSeed: 3,
+});
+const lockedCard = lockedEyes.prompts[lockedEyes.randomIndex];
+assert(/blue_eyes/.test(lockedCard), 'random card keeps blue eyes');
+assert(/forest/.test(lockedCard), 'random card keeps forest');
+assert(!/green_eyes|brown_eyes|amber_eyes|gray_eyes|hazel_eyes/.test(lockedCard), 'random card does not replace the eye color');
+
+const sceneOnly = engine.generate({
+  input: 'forest, night',
+  model: flux,
+  formatOverride: 'auto',
+  addQuality: false,
+  includeNegative: false,
+  randomSeed: 4,
+});
+assert(!/\b(1girl|1boy|woman|man)\b/i.test(sceneOnly.prompts[sceneOnly.randomIndex]), 'keywords without a person do not invent one');
+assert(/forest/i.test(sceneOnly.prompts[sceneOnly.randomIndex]), 'random scene keeps the keyword');
+
 if (failed) {
   console.error(failed + ' check(s) failed');
   process.exit(1);

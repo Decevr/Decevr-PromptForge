@@ -81,6 +81,13 @@
           notes.push('Ultra variation adds ' + ultra.added.join(', '));
         }
       }
+      const randomPrompt = makeRandomPrompt(input, format, makeRng(opts.randomSeed));
+      let randomMark = '';
+      if (randomPrompt) {
+        prompts.push(randomPrompt.text);
+        randomMark = randomPrompt.mark;
+        notes.push('Random prompt creation builds a scene from your keywords');
+      }
       if (opts.addQuality) prompts = prompts.map(function (prompt) {
         return applyQuality(prompt, model, format);
       });
@@ -97,7 +104,13 @@
       let ultraIndex = -1;
       if (ultraAdded.length) {
         prompts.forEach(function (prompt, index) {
-          if (ultraAdded.every(function (detail) { return hasPhrase(prompt, detail); })) ultraIndex = index;
+          if (ultraIndex < 0 && ultraAdded.every(function (detail) { return hasPhrase(prompt, detail); })) ultraIndex = index;
+        });
+      }
+      let randomIndex = -1;
+      if (randomMark) {
+        prompts.forEach(function (prompt, index) {
+          if (hasPhrase(prompt, randomMark)) randomIndex = index;
         });
       }
       if (opts.improvePrompt !== false && mode === 'optimize') {
@@ -114,6 +127,7 @@
         format: format,
         prompts: prompts,
         ultraIndex: ultraIndex,
+        randomIndex: randomIndex,
         negative: negative,
         notes: notes,
         settingsLine: settingsLine(model),
@@ -600,6 +614,111 @@
       ],
     },
   ];
+
+  const RANDOM_HAIR_COLORS = ['black', 'brown', 'blonde', 'red', 'silver', 'auburn'];
+  const RANDOM_HAIR_STYLES = ['long', 'short', 'wavy', 'straight'];
+  const RANDOM_EYES = ['blue', 'green', 'brown', 'amber', 'gray', 'hazel'];
+  const RANDOM_SKIN = ['fair', 'tan', 'brown', 'deep brown', 'olive'];
+  const RANDOM_AGES = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 35];
+  const RANDOM_SCENES = [
+    { keys: ['forest', 'woods'], place: 'forest', light: 'moonlight' },
+    { keys: ['city', 'street', 'alley'], place: 'city street', light: 'neon lighting' },
+    { keys: ['beach', 'ocean', 'shore'], place: 'beach', light: 'golden hour' },
+    { keys: ['cafe'], place: 'cafe', light: 'soft window light' },
+    { keys: ['bedroom'], place: 'bedroom', light: 'soft lamplight' },
+    { keys: ['studio'], place: 'studio', light: 'studio lighting' },
+    { keys: ['ballroom'], place: 'ballroom', light: 'warm light' },
+  ];
+  const RANDOM_CLOTHES = {
+    woman: ['red dress', 'black coat', 'silk gown', 'white blouse'],
+    man: ['black coat', 'dark suit', 'white shirt', 'leather jacket'],
+  };
+  const RANDOM_MOODS = ['calm expression', 'confident expression', 'gentle smile', 'serious expression'];
+
+  function makeRng(seed) {
+    if (seed === undefined || seed === null || seed === '') return Math.random;
+    let state = Number(seed) || 1;
+    return function () {
+      state = (state * 1664525 + 1013904223) % 4294967296;
+      return state / 4294967296;
+    };
+  }
+
+  function pick(rng, list) {
+    return list[Math.floor(rng() * list.length)];
+  }
+
+  function detectSubject(hay) {
+    if (/\b1girl\b|\b1 girl\b/.test(hay)) return { tag: '1girl', natural: 'woman', kind: 'woman' };
+    if (/\b1boy\b|\b1 boy\b/.test(hay)) return { tag: '1boy', natural: 'man', kind: 'man' };
+    if (/\b(woman|female|lady)\b/.test(hay)) return { tag: '1girl', natural: 'woman', kind: 'woman' };
+    if (/\b(man|male)\b/.test(hay)) return { tag: '1boy', natural: 'man', kind: 'man' };
+    if (/\bgirl\b/.test(hay)) return { tag: '1girl', natural: 'woman', kind: 'woman' };
+    if (/\bboy\b/.test(hay)) return { tag: '1boy', natural: 'man', kind: 'man' };
+    return null;
+  }
+
+  function lockedWord(hay, words) {
+    return words.find(function (word) { return hay.indexOf(word) >= 0; }) || '';
+  }
+
+  function makeRandomPrompt(input, format, rng) {
+    const raw = String(input || '').trim();
+    if (!raw) return null;
+    const hay = raw.toLowerCase().replace(/_/g, ' ');
+    const subject = detectSubject(hay);
+    const ageMatch = hay.match(/\b(\d{2})\b/);
+    const statedAge = ageMatch ? Number(ageMatch[1]) : 0;
+    const age = statedAge >= 21 ? statedAge : pick(rng, RANDOM_AGES);
+    const hairColor = RANDOM_HAIR_COLORS.find(function (color) {
+      return hay.indexOf(color + ' hair') >= 0;
+    }) || pick(rng, RANDOM_HAIR_COLORS);
+    const hairStyle = lockedWord(hay, RANDOM_HAIR_STYLES) || pick(rng, RANDOM_HAIR_STYLES);
+    const eyes = RANDOM_EYES.find(function (color) {
+      return hay.indexOf(color + ' eyes') >= 0 || hay.indexOf(color + ' eye') >= 0;
+    }) || pick(rng, RANDOM_EYES);
+    const skin = lockedWord(hay, RANDOM_SKIN) || pick(rng, RANDOM_SKIN);
+    const scene = RANDOM_SCENES.find(function (item) {
+      return item.keys.some(function (key) { return hay.indexOf(key) >= 0; });
+    }) || pick(rng, RANDOM_SCENES);
+    const clothesWord = lockedWord(hay, ['dress', 'coat', 'suit', 'shirt', 'jacket', 'gown', 'sweater', 'blouse']);
+    const clothes = clothesWord || (subject ? pick(rng, RANDOM_CLOTHES[subject.kind]) : '');
+    const mood = /\bsmile\b/.test(hay) ? 'gentle smile' : pick(rng, RANDOM_MOODS);
+    const hair = hairStyle + ' ' + hairColor + ' hair';
+    const eyePhrase = eyes + ' eyes';
+    const covered = [hair, eyePhrase, scene.place, scene.light, clothes, skin + ' skin', mood].join(' ').toLowerCase();
+    const extra = raw.split(/[,\n]+/).map(function (part) { return part.trim(); }).filter(function (part) {
+      const token = part.toLowerCase().replace(/_/g, ' ');
+      if (!token || token.split(/\s+/).length > 3) return false;
+      if (/^(1girl|1boy|1 girl|1 boy|girl|boy|woman|man|female|male|lady)$/.test(token)) return false;
+      return covered.indexOf(token) < 0;
+    });
+    let text;
+    let mark;
+    if (format === 'natural' && subject) {
+      text = 'A ' + age + ' year old ' + subject.natural + ' with ' + hair + ', ' + eyePhrase + ', and ' + skin + ' skin'
+        + (clothes ? ', wearing a ' + clothes : '')
+        + ', in a ' + scene.place + ', ' + scene.light + ', ' + mood + '.';
+      mark = age + ' year old';
+    } else if (format === 'natural') {
+      const place = scene.place.charAt(0).toUpperCase() + scene.place.slice(1);
+      text = (/\beyes\b/.test(hay) ? eyePhrase + ', ' : '') + place + ', ' + scene.light + ', ' + mood + '.';
+      mark = scene.light + ', ' + mood;
+    } else {
+      const parts = [];
+      if (subject) {
+        parts.push(subject.tag, age + ' years old', hair, eyePhrase, skin + ' skin');
+        if (clothes) parts.push(clothes);
+      } else if (/\beyes\b/.test(hay)) {
+        parts.push(eyePhrase);
+      }
+      parts.push(scene.place, scene.light, mood);
+      text = parts.map(function (part) { return formatTagToken(part, format); }).join(', ');
+      mark = subject ? (age + ' years old') : (scene.light + ' ' + mood);
+    }
+    if (extra.length) text = appendDetails(text, format, extra);
+    return { text: text, mark: mark };
+  }
 
   function makeUltraVariation(prompt, format) {
     const hay = prompt.toLowerCase().replace(/_/g, ' ');

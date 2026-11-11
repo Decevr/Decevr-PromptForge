@@ -20,6 +20,8 @@ A desktop shortcut named PromptForge points at the same app after the first setu
 - Automatic spelling fixes, then a prompt cleanup: tag order, shorthand, filler, and a light cue when the prompt has none
 - Single-word variations, and paste-to-optimize for a full prompt
 - Ultra variation: on a full prompt, an extra card keeps the scene and adds a few implied details
+- Random prompt creation: another card builds a full scene from your keywords. `1girl` or `1boy` becomes one random adult, 21 or older
+- Character templates can save a random female or male adult from the Characters panel
 - Quality tags and negative prompt toggles
 - Character templates: save a description (age, gender, race, hair, eyes, face, makeup, nails, skin, body, breasts, ass, vagina, penis, clothing, style) and insert it in the current format
 - Camera angles and lenses: insert the angle or lens in natural language or tags
