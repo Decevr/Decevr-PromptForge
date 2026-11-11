@@ -174,6 +174,11 @@ assert(corrected('post') === 'post', 'post stays post');
 assert(corrected('shop') === 'shop', 'shop stays shop');
 assert(corrected('angel') === 'angel', 'angel stays angel');
 assert(corrected('form') === 'form', 'form stays form');
+['slime', 'kemono', 'scalie', 'bear', 'shark', 'elephant', 'moth', 'duck', 'reindeer', 'elf', 'tiefling', 'kitsune'].forEach((word) => {
+  assert(corrected(word) === word, word + ' stays ' + word + ', got ' + corrected(word));
+});
+assert(corrected('anthro bear') === 'anthro bear', 'anthro bear stays anthro bear, got ' + corrected('anthro bear'));
+assert(corrected('dark elf') === 'dark elf', 'dark elf stays dark elf, got ' + corrected('dark elf'));
 
 assert(messyTags.prompts.length >= 3, 'tag prompt keeps three suggestions');
 assert(/dramatic_lighting/i.test(messyTags.prompts[1]), 'tag suggestion 2 swaps in dramatic lighting');

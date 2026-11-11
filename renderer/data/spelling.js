@@ -138,6 +138,7 @@
     'side', 'their', 'there', 'three', 'under', 'each', 'some', 'such', 'been',
     'post', 'shop', 'hail', 'cost', 'wood', 'mood', 'talk', 'gate', 'hard',
     'hare', 'desk', 'show',
+    'slime', 'kemono', 'scalie', 'bear', 'shark', 'elephant', 'moth', 'duck', 'reindeer',
   ];
 
   const NOT_A_TARGET = new Set([
@@ -153,6 +154,7 @@
     'fast', 'fact', 'band', 'land', 'sand', 'kind', 'mind', 'find', 'soul', 'role',
     'bark', 'note', 'wind', 'post', 'shop', 'hail', 'cost', 'wood', 'mood',
     'talk', 'gate', 'hard', 'hare', 'desk', 'show',
+    'slime', 'kemono', 'scalie', 'bear', 'shark', 'elephant', 'moth', 'duck', 'reindeer',
   ]);
 
   const LEXICON = new Set(WORDS.concat(KEEP).map(function (word) { return word.toLowerCase(); }));

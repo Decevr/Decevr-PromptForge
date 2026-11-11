@@ -40,6 +40,14 @@ app.whenReady().then(async () => {
       return !!document.querySelector('#character-form [name="' + name + '"]');
     });
     const marksHeading = [...document.querySelectorAll('#character-form .field-section')].some((node) => node.textContent === 'Marks, piercings, and tattoos');
+    const raceInput = document.querySelector('#character-form [name="race"]');
+    const raceIsInput = !!(raceInput && raceInput.tagName === 'INPUT' && raceInput.type === 'text');
+    const raceValues = [...document.querySelectorAll('#race-options option')].map((option) => option.value);
+    const raceFantasy = ['elf', 'orc', 'tiefling', 'kitsune'].every((race) => raceValues.includes(race));
+    const raceFurry = ['anthro fox', 'anthro wolf', 'anthro bear', 'catgirl', 'kemono'].every((race) => raceValues.includes(race));
+    raceInput.value = 'anthro bear';
+    const raceTyped = raceInput.value === 'anthro bear';
+    raceInput.value = '';
     document.getElementById('char-close').click();
     const charClosed = document.getElementById('character-modal').hidden === true;
     document.getElementById('negatives-open').click();
@@ -124,7 +132,7 @@ app.whenReady().then(async () => {
     wardrobeColor.value = 'red';
     const clothingIdle = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     wardrobeColor.value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionImage, motionVideo, motionSkipped, sceneMale, sceneFemale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, clothingApron, clothingShirt, clothingIdle });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionImage, motionVideo, motionSkipped, sceneMale, sceneFemale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, clothingApron, clothingShirt, clothingIdle });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -146,6 +154,10 @@ app.whenReady().then(async () => {
   if (!parsed.charOpen || !parsed.charClosed) problems.push('character modal did not open and close');
   if (!parsed.charFields) problems.push('character body and mark fields missing');
   if (!parsed.marksHeading) problems.push('marks section missing');
+  if (!parsed.raceIsInput) problems.push('race is not a text field');
+  if (!parsed.raceFantasy) problems.push('fantasy races missing');
+  if (!parsed.raceFurry) problems.push('furry races missing');
+  if (!parsed.raceTyped) problems.push('race field rejected a typed furry race');
   if (!/extra people/.test(parsed.negative)) problems.push('custom negative missing: ' + parsed.negative);
   if (parsed.tools.length !== 4) problems.push('tool buttons: ' + parsed.tools.join(', '));
   if (parsed.selectedText !== 'No characters selected') problems.push('selected characters: ' + parsed.selectedText);

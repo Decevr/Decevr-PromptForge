@@ -4,7 +4,7 @@
     { key: 'name', label: 'Name', required: true },
     { key: 'age', label: 'Age', placeholder: '25' },
     { key: 'gender', label: 'Gender' },
-    { key: 'race', label: 'Race' },
+    { key: 'race', label: 'Race', placeholder: 'elf, orc, anthro fox, or any race' },
     { key: 'hair', label: 'Hair', section: 'Look' },
     { key: 'eyes', label: 'Eyes' },
     { key: 'face', label: 'Face / Features' },
@@ -93,6 +93,12 @@
     return [name].concat(parts).filter(Boolean).join(', ');
   }
 
+  const RACE_GROUPS = [
+    { label: 'Human', values: ['East Asian', 'Black', 'White', 'Latina', 'Latino', 'South Asian', 'Middle Eastern', 'mixed'] },
+    { label: 'Fantasy', values: ['elf', 'high elf', 'wood elf', 'dark elf', 'drow', 'half-elf', 'orc', 'half-orc', 'dwarf', 'gnome', 'halfling', 'fairy', 'nymph', 'dryad', 'satyr', 'centaur', 'minotaur', 'harpy', 'lamia', 'naga', 'mermaid', 'siren', 'goblin', 'troll', 'ogre', 'giant', 'tiefling', 'aasimar', 'dragonborn', 'dragon', 'kobold', 'lizardfolk', 'kitsune', 'oni', 'demon', 'succubus', 'incubus', 'angel', 'vampire', 'werewolf', 'golem', 'elemental', 'slime'] },
+    { label: 'Furry', values: ['anthro', 'furry', 'kemono', 'scalie', 'anthro cat', 'anthro fox', 'anthro wolf', 'anthro bunny', 'anthro dog', 'anthro lion', 'anthro tiger', 'anthro bear', 'anthro deer', 'anthro horse', 'anthro dragon', 'anthro shark', 'anthro snake', 'anthro mouse', 'anthro raccoon', 'anthro hyena', 'anthro cow', 'anthro goat', 'anthro panda', 'anthro otter', 'anthro bat', 'anthro bird', 'anthro lizard', 'catgirl', 'foxgirl', 'wolfgirl', 'bunnygirl', 'feline', 'canine', 'vulpine', 'lupine'] },
+  ];
+
   function renderFieldInputs() {
     let html = '';
     let section = '';
@@ -102,7 +108,18 @@
         html += '<h3 class="field-section">' + escapeHtml(section) + '</h3>';
       }
       const placeholder = field.placeholder ? ' placeholder="' + escapeHtml(field.placeholder) + '"' : '';
-      html += '<label><span>' + escapeHtml(field.label) + (field.required ? ' *' : '') + '</span><input name="' + field.key + '" type="text"' + placeholder + (field.required ? ' required' : '') + ' /></label>';
+      html += '<label><span>' + escapeHtml(field.label) + (field.required ? ' *' : '') + '</span><input name="' + field.key + '" type="text"' + placeholder + (field.required ? ' required' : '') + (field.key === 'race' ? ' list="race-options" autocomplete="off"' : '') + ' />';
+      if (field.key === 'race') {
+        html += '<span class="hint">Any typed race works, including fantasy and furry.</span>';
+        html += '<datalist id="race-options">';
+        RACE_GROUPS.forEach(function (group) {
+          group.values.forEach(function (value) {
+            html += '<option value="' + escapeHtml(value) + '" label="' + escapeHtml(group.label) + '"></option>';
+          });
+        });
+        html += '</datalist>';
+      }
+      html += '</label>';
     });
     return html;
   }
