@@ -114,7 +114,7 @@
     }
     if (event.key === 'Escape') {
       if (state.open) closeModels();
-      ['character-modal', 'camera-modal', 'negative-modal'].forEach(function (id) {
+      ['character-modal', 'camera-modal', 'negative-modal', 'extra-modal'].forEach(function (id) {
         const modal = document.getElementById(id);
         if (modal) modal.hidden = true;
       });

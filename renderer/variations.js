@@ -7,11 +7,9 @@
     button.className = 'tool-btn';
     button.id = 'more-variations';
     button.textContent = 'More variations';
-    button.title = 'Generate another set from the same prompt';
+    button.title = 'Open the variation menus';
     button.addEventListener('click', function () {
-      const input = document.getElementById('prompt-input');
-      if (!input || !input.value.trim()) return;
-      document.dispatchEvent(new CustomEvent('promptforge:more-variations'));
+      if (window.PromptForgeExtras && window.PromptForgeExtras.open) window.PromptForgeExtras.open();
     });
     toolBar.appendChild(button);
   }

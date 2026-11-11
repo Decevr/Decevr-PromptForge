@@ -148,6 +148,70 @@
         ['Standing together', 'two adults having sex, standing, one leg lifted'],
       ],
     },
+    {
+      id: 'style',
+      label: 'Artist style',
+      match: 'selected',
+      keys: [],
+      options: [
+        ['Anime', 'anime illustration'],
+        ['Semi-realistic', 'semi-realistic'],
+        ['Photoreal', 'photoreal'],
+        ['Painterly', 'painterly'],
+        ['Watercolor', 'watercolor'],
+        ['Ink', 'ink drawing'],
+        ['Oil paint', 'oil painting'],
+        ['Cel shaded', 'cel shading'],
+        ['Art nouveau', 'art nouveau'],
+        ['Comic', 'comic ink'],
+        ['Ukiyo-e', 'ukiyo-e'],
+        ['Impressionist', 'impressionist painting'],
+        ['Fashion photo', 'fashion editorial'],
+        ['Film noir', 'film noir'],
+        ['Pastel', 'soft pastel'],
+        ['Baroque', 'baroque painting'],
+        ['Sketch', 'pencil sketch'],
+        ['3D render', '3d render'],
+      ],
+    },
+    {
+      id: 'artist',
+      label: 'Artist',
+      match: 'selected',
+      keys: [],
+      options: [
+        ['WLOP', 'in the style of WLOP', 'wlop', 'Illustration'],
+        ['Sakimichan', 'in the style of Sakimichan', 'sakimichan', 'Illustration'],
+        ['Artgerm', 'in the style of Artgerm', 'artgerm', 'Illustration'],
+        ['Rossdraws', 'in the style of Rossdraws', 'rossdraws', 'Illustration'],
+        ['Guweiz', 'in the style of Guweiz', 'guweiz', 'Illustration'],
+        ['Wanke', 'in the style of Wanke', 'wanke', 'Illustration'],
+        ['Ciloranko', 'in the style of Ciloranko', 'ciloranko', 'Illustration'],
+        ['Modare', 'in the style of Modare', 'modare', 'Illustration'],
+        ['Sciamano240', 'in the style of Sciamano240', 'sciamano240', 'Illustration'],
+        ['Nixeu', 'in the style of Nixeu', 'nixeu', 'Illustration'],
+        ['Ilya Kuvshinov', 'in the style of Ilya Kuvshinov', 'ilya_kuvshinov', 'Illustration'],
+        ['Loish', 'in the style of Loish', 'loish', 'Illustration'],
+        ['Krenz Cushart', 'in the style of Krenz Cushart', 'krenz_cushart', 'Illustration'],
+        ['Atey Ghailan', 'in the style of Atey Ghailan', 'atey_ghailan', 'Illustration'],
+        ['Alphonse Mucha', 'in the style of Alphonse Mucha', 'alphonse_mucha', 'Painting'],
+        ['Gustav Klimt', 'in the style of Gustav Klimt', 'gustav_klimt', 'Painting'],
+        ['John William Waterhouse', 'in the style of John William Waterhouse', 'john_william_waterhouse', 'Painting'],
+        ['John Singer Sargent', 'in the style of John Singer Sargent', 'john_singer_sargent', 'Painting'],
+        ['J.C. Leyendecker', 'in the style of J.C. Leyendecker', 'jc_leyendecker', 'Painting'],
+        ['Norman Rockwell', 'in the style of Norman Rockwell', 'norman_rockwell', 'Painting'],
+        ['Frank Frazetta', 'in the style of Frank Frazetta', 'frank_frazetta', 'Painting'],
+        ['Brom', 'in the style of Brom', 'brom', 'Painting'],
+        ['Moebius', 'in the style of Moebius', 'moebius', 'Painting'],
+        ['Yoshitaka Amano', 'in the style of Yoshitaka Amano', 'yoshitaka_amano', 'Painting'],
+        ['Range Murata', 'in the style of Range Murata', 'range_murata', 'Painting'],
+        ['Peter Lindbergh', 'in the style of Peter Lindbergh', 'peter_lindbergh', 'Photography'],
+        ['Helmut Newton', 'in the style of Helmut Newton', 'helmut_newton', 'Photography'],
+        ['Annie Leibovitz', 'in the style of Annie Leibovitz', 'annie_leibovitz', 'Photography'],
+        ['Steve McCurry', 'in the style of Steve McCurry', 'steve_mccurry', 'Photography'],
+        ['Tim Walker', 'in the style of Tim Walker', 'tim_walker', 'Photography'],
+      ],
+    },
   ];
 
   function loadSaved() {
@@ -189,21 +253,42 @@
     return text;
   }
 
+  function keysFor(menu, phrase, tag) {
+    if (menu.match !== 'selected') return menu.keys;
+    const raw = String(tag || phrase || '').toLowerCase().replace(/_/g, ' ').trim();
+    const skip = { the: 1, and: 1, with: 1, from: 1, style: 1, of: 1, in: 1, for: 1 };
+    const words = raw.split(/[^a-z0-9]+/).filter(function (word) {
+      return word.length > 2 && !skip[word];
+    });
+    return words.length ? [raw].concat(words) : [raw];
+  }
+
   function selectedAdds(input) {
     const adds = [];
     MENUS.forEach(function (menu) {
       const select = document.getElementById('extra-' + menu.id);
       if (!select || !select.value) return;
-      if (hasAny(input, menu.keys)) return;
       const option = menu.options.find(function (item) { return item[1] === select.value; });
+      const phrase = option ? option[1] : select.value;
+      const tag = option && option[2] ? option[2] : '';
+      const keys = keysFor(menu, phrase, tag);
+      if (hasAny(input, keys)) return;
       adds.push({
         id: menu.id,
         label: menu.label,
-        keys: menu.keys,
-        text: option ? option[1] : select.value,
+        keys: keys,
+        text: phrase,
+        tag: tag,
       });
     });
     return adds;
+  }
+
+  function renderAdd(add, format) {
+    if (add.tag && format !== 'natural') {
+      return format === 'danbooru' ? add.tag.replace(/\s+/g, '_') : add.tag.replace(/_/g, ' ');
+    }
+    return formatPhrase(add.text, format);
   }
 
   function apply(prompts, input, format) {
@@ -214,7 +299,7 @@
       const parts = [];
       adds.forEach(function (add) {
         if (hasAny(prompt, add.keys)) return;
-        parts.push(formatPhrase(add.text, format));
+        parts.push(renderAdd(add, format));
         used[add.label] = true;
       });
       if (!parts.length) return prompt;
@@ -228,22 +313,52 @@
     };
   }
 
+  function renderMenu(menu, saved) {
+    const options = ['<option value="">None</option>'];
+    let group = '';
+    menu.options.forEach(function (option) {
+      const nextGroup = option[3] || '';
+      if (nextGroup !== group) {
+        if (group) options.push('</optgroup>');
+        if (nextGroup) options.push('<optgroup label="' + escapeHtml(nextGroup) + '">');
+        group = nextGroup;
+      }
+      const selected = saved[menu.id] === option[1] ? ' selected' : '';
+      options.push('<option value="' + escapeHtml(option[1]) + '"' + selected + '>' + escapeHtml(option[0]) + '</option>');
+    });
+    if (group) options.push('</optgroup>');
+    return '<label class="extra-field"><span>' + escapeHtml(menu.label) + '</span><select id="extra-' + menu.id + '">' + options.join('') + '</select></label>';
+  }
+
   function init() {
-    const toolBar = document.getElementById('tool-bar');
-    if (!toolBar || document.getElementById('extra-bar')) return;
+    if (document.getElementById('extra-modal')) return;
     const saved = loadSaved();
-    const bar = document.createElement('div');
-    bar.id = 'extra-bar';
-    bar.className = 'extra-bar';
-    bar.innerHTML = MENUS.map(function (menu) {
-      const options = ['<option value="">None</option>'].concat(menu.options.map(function (option) {
-        const selected = saved[menu.id] === option[1] ? ' selected' : '';
-        return '<option value="' + escapeHtml(option[1]) + '"' + selected + '>' + escapeHtml(option[0]) + '</option>';
-      }));
-      return '<label class="extra-field"><span>' + escapeHtml(menu.label) + '</span><select id="extra-' + menu.id + '">' + options.join('') + '</select></label>';
-    }).join('');
-    toolBar.insertAdjacentElement('afterend', bar);
-    bar.addEventListener('change', function () {
+    const modal = document.createElement('div');
+    modal.id = 'extra-modal';
+    modal.className = 'character-modal';
+    modal.hidden = true;
+    modal.innerHTML = [
+      '<div class="character-dialog" role="dialog" aria-labelledby="extra-title">',
+      '<div class="character-head"><h2 id="extra-title">More variations</h2>',
+      '<button type="button" class="text-btn" id="extra-close">Close</button></div>',
+      '<p class="extra-note">A choice is added when you generate, and only when that idea is not already in the prompt you typed.</p>',
+      '<div id="extra-bar" class="extra-bar">',
+      MENUS.map(function (menu) { return renderMenu(menu, saved); }).join(''),
+      '</div>',
+      '<div class="extra-actions"><button type="button" class="generate" id="extra-generate">Generate another set</button></div>',
+      '</div>',
+    ].join('');
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function (event) {
+      if (event.target === modal) modal.hidden = true;
+    });
+    document.getElementById('extra-close').addEventListener('click', function () { modal.hidden = true; });
+    document.getElementById('extra-generate').addEventListener('click', function () {
+      const input = document.getElementById('prompt-input');
+      if (!input || !input.value.trim()) return;
+      document.dispatchEvent(new CustomEvent('promptforge:more-variations'));
+    });
+    modal.addEventListener('change', function () {
       const values = {};
       MENUS.forEach(function (menu) {
         const select = document.getElementById('extra-' + menu.id);
@@ -251,9 +366,11 @@
       });
       saveSaved(values);
     });
+    function open() { modal.hidden = false; }
+    window.PromptForgeExtras.open = open;
   }
 
-  window.PromptForgeExtras = { apply: apply, menus: MENUS };
+  window.PromptForgeExtras = { apply: apply, menus: MENUS, open: function () {} };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
