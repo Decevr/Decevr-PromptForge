@@ -1,6 +1,9 @@
 const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 
+// The visible title can change. Saved characters and history stay in this folder.
+app.setPath('userData', path.join(app.getPath('appData'), 'PromptForge'));
+
 let mainWindow = null;
 
 const gotLock = app.requestSingleInstanceLock();
