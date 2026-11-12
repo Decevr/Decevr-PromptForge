@@ -139,6 +139,15 @@
     'post', 'shop', 'hail', 'cost', 'wood', 'mood', 'talk', 'gate', 'hard',
     'hare', 'desk', 'show',
     'slime', 'kemono', 'scalie', 'bear', 'shark', 'elephant', 'moth', 'duck', 'reindeer',
+    'eladrin', 'shadar', 'duergar', 'svirfneblin', 'firbolg', 'goliath', 'bugbear', 'hobgoblin', 'gnoll',
+    'tabaxi', 'leonin', 'harengon', 'aarakocra', 'kenku', 'owlin', 'tortle', 'locathah', 'grung', 'loxodon',
+    'catfolk', 'foxfolk', 'wolffolk', 'serpentfolk', 'birdfolk', 'ratfolk', 'ravenfolk', 'lizardfolk', 'dragonborn',
+    'yuan', 'medusa', 'gorgon', 'drider', 'rakshasa', 'triton', 'merfolk', 'cecaelia', 'selkie', 'undine', 'nereid',
+    'hamadryad', 'oread', 'sylph', 'faun', 'changeling', 'genasi', 'ifrit', 'djinn', 'marid', 'efreet',
+    'cambion', 'nephilim', 'valkyrie', 'dhampir', 'revenant', 'banshee', 'dullahan', 'jiangshi', 'tengu',
+    'nekomata', 'kirin', 'alraune', 'onna', 'myconid', 'plasmoid', 'warforged', 'kalashtar', 'illithid',
+    'githyanki', 'githzerai', 'vedalken', 'jotun', 'cyclops', 'ettin', 'tiefling', 'aasimar', 'kitsune',
+    'kobold', 'drow', 'lamia', 'naga', 'succubus', 'incubus', 'golem', 'flayer', 'kreen', 'scylla', 'sphinx',
   ];
 
   const NOT_A_TARGET = new Set([
@@ -155,6 +164,15 @@
     'bark', 'note', 'wind', 'post', 'shop', 'hail', 'cost', 'wood', 'mood',
     'talk', 'gate', 'hard', 'hare', 'desk', 'show',
     'slime', 'kemono', 'scalie', 'bear', 'shark', 'elephant', 'moth', 'duck', 'reindeer',
+    'eladrin', 'shadar', 'duergar', 'svirfneblin', 'firbolg', 'goliath', 'bugbear', 'hobgoblin', 'gnoll',
+    'tabaxi', 'leonin', 'harengon', 'aarakocra', 'kenku', 'owlin', 'tortle', 'locathah', 'grung', 'loxodon',
+    'catfolk', 'foxfolk', 'wolffolk', 'serpentfolk', 'birdfolk', 'ratfolk', 'ravenfolk', 'lizardfolk', 'dragonborn',
+    'yuan', 'medusa', 'gorgon', 'drider', 'rakshasa', 'triton', 'merfolk', 'cecaelia', 'selkie', 'undine', 'nereid',
+    'hamadryad', 'oread', 'sylph', 'faun', 'changeling', 'genasi', 'ifrit', 'djinn', 'marid', 'efreet',
+    'cambion', 'nephilim', 'valkyrie', 'dhampir', 'revenant', 'banshee', 'dullahan', 'jiangshi', 'tengu',
+    'nekomata', 'kirin', 'alraune', 'onna', 'myconid', 'plasmoid', 'warforged', 'kalashtar', 'illithid',
+    'githyanki', 'githzerai', 'vedalken', 'jotun', 'cyclops', 'ettin', 'tiefling', 'aasimar', 'kitsune',
+    'kobold', 'drow', 'lamia', 'naga', 'succubus', 'incubus', 'golem', 'flayer', 'kreen', 'scylla', 'sphinx',
   ]);
 
   const LEXICON = new Set(WORDS.concat(KEEP).map(function (word) { return word.toLowerCase(); }));

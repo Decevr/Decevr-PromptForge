@@ -43,7 +43,7 @@ app.whenReady().then(async () => {
     const raceInput = document.querySelector('#character-form [name="race"]');
     const raceIsInput = !!(raceInput && raceInput.tagName === 'INPUT' && raceInput.type === 'text');
     const raceValues = [...document.querySelectorAll('#race-options option')].map((option) => option.value);
-    const raceFantasy = ['elf', 'orc', 'tiefling', 'kitsune'].every((race) => raceValues.includes(race));
+    const raceFantasy = ['elf', 'orc', 'tiefling', 'kitsune', 'firbolg', 'tabaxi', 'genasi', 'dhampir', 'aarakocra', 'yuan-ti', 'githyanki', 'warforged'].every((race) => raceValues.includes(race));
     const raceFurry = ['anthro fox', 'anthro wolf', 'anthro bear', 'catgirl', 'kemono'].every((race) => raceValues.includes(race));
     raceInput.value = 'anthro bear';
     const raceTyped = raceInput.value === 'anthro bear';
@@ -85,10 +85,16 @@ app.whenReady().then(async () => {
     const artistSkipped = window.PromptForgeExtras.apply(['close-up'], 'wlop portrait', 'danbooru').prompts[0];
     const artistNatural = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     document.getElementById('extra-artist').value = '';
-    document.getElementById('extra-motion').value = 'two adults thrusting slowly';
+    const motionOptions = [...document.querySelectorAll('#extra-motion option')].filter((option) => option.value);
+    const motionNamed = motionOptions.length >= 40 && motionOptions.every((option) => option.value.toLowerCase().startsWith(option.textContent.toLowerCase() + ', '));
+    const motionMaleFace = motionOptions.filter((option) => /his penis|adult male partner/.test(option.value)).every((option) => /his face out of frame or obscured|his face obscured/.test(option.value));
+    const motionFemaleClear = motionOptions.filter((option) => /adult female partner|strap-on penis|adult women/.test(option.value) && !/his penis|adult male partner/.test(option.value)).every((option) => !/his face/.test(option.value));
+    const slowVaginal = motionOptions.find((option) => option.textContent === 'Slow vaginal thrusts');
+    document.getElementById('extra-motion').value = slowVaginal ? slowVaginal.value : '';
     const motionImage = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural', 'image').prompts[0];
     const motionVideo = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural', 'video').prompts[0];
-    const motionSkipped = window.PromptForgeExtras.apply(['close-up'], 'already thrusting', 'natural', 'video').prompts[0];
+    const motionSkipped = window.PromptForgeExtras.apply(['close-up'], 'slow vaginal thrusts', 'natural', 'video').prompts[0];
+    const motionOther = window.PromptForgeExtras.apply(['close-up'], 'already grinding', 'natural', 'video').prompts[0];
     document.getElementById('extra-motion').value = '';
     const sexOptions = [...document.querySelectorAll('#extra-sex-scene option')];
     const maleFace = sexOptions.filter((option) => /\(Male\)/.test(option.textContent)).every((option) => {
@@ -146,7 +152,7 @@ app.whenReady().then(async () => {
     wardrobeColor.value = 'red';
     const clothingIdle = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     wardrobeColor.value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionImage, motionVideo, motionSkipped, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionNamed, motionMaleFace, motionFemaleClear, motionImage, motionVideo, motionSkipped, motionOther, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -180,9 +186,13 @@ app.whenReady().then(async () => {
   if (parsed.stealthCount < 12) problems.push('stealth count: ' + parsed.stealthCount);
   if (!parsed.stealthLabel) problems.push('stealth masturbation button missing');
   if (parsed.extraCount < 15) problems.push('variation menus: ' + parsed.extraCount);
-  if (/thrusting/.test(parsed.motionImage)) problems.push('motion added on an image model: ' + parsed.motionImage);
-  if (!/thrusting slowly/.test(parsed.motionVideo)) problems.push('motion missing on video: ' + parsed.motionVideo);
-  if (/thrusting slowly/.test(parsed.motionSkipped)) problems.push('motion replaced a typed motion: ' + parsed.motionSkipped);
+  if (!parsed.motionNamed) problems.push('a motion prompt does not start with its menu name');
+  if (!parsed.motionMaleFace) problems.push('a male motion is missing the hidden face');
+  if (!parsed.motionFemaleClear) problems.push('a female motion hid his face');
+  if (/vaginal thrusts|thrusting/.test(parsed.motionImage)) problems.push('motion added on an image model: ' + parsed.motionImage);
+  if (!/slow vaginal thrusts/.test(parsed.motionVideo) || !/his penis thrusting slowly inside her vagina/.test(parsed.motionVideo) || !/his face out of frame or obscured/.test(parsed.motionVideo)) problems.push('motion missing on video: ' + parsed.motionVideo);
+  if (/slow vaginal thrusts/.test(parsed.motionSkipped)) problems.push('motion repeated a typed motion: ' + parsed.motionSkipped);
+  if (!/slow vaginal thrusts/.test(parsed.motionOther) || !/inside her vagina/.test(parsed.motionOther)) problems.push('a different motion blocked the selected one: ' + parsed.motionOther);
   if (!parsed.sceneMale.startsWith('an adult woman bent forward') || !/his penis inside her vagina/.test(parsed.sceneMale) || !/sex from behind/.test(parsed.sceneMale) || !/his face out of frame or obscured/.test(parsed.sceneMale)) problems.push('male sex scene: ' + parsed.sceneMale);
   if (!/strap-on penis inside her vagina/.test(parsed.sceneFemale) || /his face/.test(parsed.sceneFemale)) problems.push('female sex scene: ' + parsed.sceneFemale);
   if (!parsed.maleFace) problems.push('a male sex scene is missing the hidden face');
