@@ -152,7 +152,26 @@ app.whenReady().then(async () => {
     wardrobeColor.value = 'red';
     const clothingIdle = window.PromptForgeExtras.apply(['close-up'], 'eyes', 'natural').prompts[0];
     wardrobeColor.value = '';
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionNamed, motionMaleFace, motionFemaleClear, motionImage, motionVideo, motionSkipped, motionOther, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle });
+    const sceneButtons = ['scene-solo', 'scene-male', 'scene-female'].every((id) => {
+      const node = document.getElementById(id);
+      return !!(node && !node.closest('.tool-bar'));
+    });
+    const sceneApi = window.PromptForgeScenes;
+    let sceneActsOk = !!(sceneApi && sceneButtons);
+    if (sceneActsOk) {
+      ['solo', 'male', 'female'].forEach((kind) => {
+        for (let index = 0; index < sceneApi.counts[kind]; index += 1) {
+          const line = sceneApi.roll(kind, 'natural', index);
+          if (/school|teen|loli|child|dorm/.test(line)) sceneActsOk = false;
+          if (kind === 'solo' && !(/adult woman/.test(line) && /vagina|pussy|clit|dildo|vibrator/.test(line))) sceneActsOk = false;
+          if (kind === 'male' && !(/adult male partner/.test(line) && /penis/.test(line) && /only his face is out of frame or obscured/.test(line))) sceneActsOk = false;
+          if (kind === 'female' && (!/adult female partner/.test(line) || /his face/.test(line) || !/strap-on|pussies|pussy|fingers/.test(line))) sceneActsOk = false;
+        }
+      });
+      const maleSceneTags = sceneApi.roll('male', 'danbooru', 0);
+      if (!/penis/.test(maleSceneTags) || !/faceless male/.test(maleSceneTags) || !/doggystyle/.test(maleSceneTags)) sceneActsOk = false;
+    }
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionNamed, motionMaleFace, motionFemaleClear, motionImage, motionVideo, motionSkipped, motionOther, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle, sceneButtons, sceneActsOk });
   `);
   const parsed = JSON.parse(report);
   const problems = [];
@@ -180,6 +199,8 @@ app.whenReady().then(async () => {
   if (!parsed.raceTyped) problems.push('race field rejected a typed furry race');
   if (!/extra people/.test(parsed.negative)) problems.push('custom negative missing: ' + parsed.negative);
   if (parsed.tools.length !== 4) problems.push('tool buttons: ' + parsed.tools.join(', '));
+  if (!parsed.sceneButtons) problems.push('explicit scene buttons missing');
+  if (!parsed.sceneActsOk) problems.push('explicit scene text does not match the selected act');
   if (parsed.selectedText !== 'No characters selected') problems.push('selected characters: ' + parsed.selectedText);
   if (parsed.angleCount < 30) problems.push('angle count: ' + parsed.angleCount);
   if (parsed.lensCount < 25) problems.push('lens count: ' + parsed.lensCount);

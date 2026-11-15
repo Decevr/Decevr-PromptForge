@@ -475,6 +475,22 @@ textarea:focus, select:focus, .combo-button:focus, .combo-panel input:focus, .pr
   padding: 14px 28px 0;
 }
 
+.scene-bar {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px 0;
+}
+
+.scene-bar > span {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e0b56a;
+}
+
 .tool-btn {
   min-height: 42px;
   padding: 8px 18px;
