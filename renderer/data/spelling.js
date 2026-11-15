@@ -62,6 +62,40 @@
     forrests: 'forests',
     closeup: 'close-up',
     dont: 'dont',
+    haor: 'hair',
+    vaginia: 'vagina',
+    vigina: 'vagina',
+    vagena: 'vagina',
+    peniz: 'penis',
+    pennis: 'penis',
+    pusy: 'pussy',
+    pussi: 'pussy',
+    puussy: 'pussy',
+    clitorus: 'clitoris',
+    clitories: 'clitoris',
+    dildoe: 'dildo',
+    vibrater: 'vibrator',
+    masterbation: 'masturbation',
+    masterbating: 'masturbating',
+    orgasam: 'orgasm',
+    orgasim: 'orgasm',
+    nippel: 'nipple',
+    nippels: 'nipples',
+    brest: 'breast',
+    brests: 'breasts',
+    lingere: 'lingerie',
+    lingeri: 'lingerie',
+    lingeire: 'lingerie',
+    pantys: 'panties',
+    dogystyle: 'doggystyle',
+    doggiestyle: 'doggystyle',
+    cunilingus: 'cunnilingus',
+    cunnilingis: 'cunnilingus',
+    felatio: 'fellatio',
+    fuking: 'fucking',
+    cuming: 'cumming',
+    cremepie: 'creampie',
+    scisoring: 'scissoring',
   };
 
   const WORDS = [
@@ -148,6 +182,29 @@
     'nekomata', 'kirin', 'alraune', 'onna', 'myconid', 'plasmoid', 'warforged', 'kalashtar', 'illithid',
     'githyanki', 'githzerai', 'vedalken', 'jotun', 'cyclops', 'ettin', 'tiefling', 'aasimar', 'kitsune',
     'kobold', 'drow', 'lamia', 'naga', 'succubus', 'incubus', 'golem', 'flayer', 'kreen', 'scylla', 'sphinx',
+    'cleaning', 'clean', 'leaning', 'leans', 'lies', 'moist', 'anima', 'hazel', 'helmut', 'overbust', 'beta',
+    'curvy', 'latex', 'grinding', 'grind', 'moaning', 'moan', 'moans', 'striking', 'setting',
+  ];
+
+  const EXPLICIT = [
+    'pussy', 'pussies', 'vagina', 'vaginas', 'vaginal', 'penis', 'penises', 'clit', 'clits',
+    'clitoris', 'clitoral', 'dildo', 'dildos', 'vibrator', 'vibrators', 'nude', 'nudes', 'naked',
+    'topless', 'bottomless', 'anal', 'anus', 'oral', 'fuck', 'fucks', 'fucked', 'fucking',
+    'cock', 'cocks', 'boob', 'boobs', 'tits', 'nipple', 'nipples', 'breast', 'breasts',
+    'areola', 'areolas', 'areolae', 'labia', 'vulva', 'cleavage', 'lingerie', 'panties', 'panty',
+    'thong', 'thongs', 'orgasm', 'orgasms', 'orgasming', 'masturbation', 'masturbating',
+    'groaning', 'panting', 'thrusting', 'thrust', 'thrusts', 'penetration', 'penetrating',
+    'fingering', 'scissoring', 'tribadism', 'cunnilingus', 'fellatio', 'doggystyle', 'missionary',
+    'cowgirl', 'spooning', 'paizuri', 'facesitting', 'strapon', 'handjob', 'blowjob', 'deepthroat',
+    'pegging', 'creampie', 'cumshot', 'cumming', 'squirting', 'squirt', 'squirts', 'semen', 'precum',
+    'saliva', 'sucking', 'licking', 'stroking', 'spanking', 'bondage', 'shibari', 'gagged',
+    'horny', 'erotic', 'explicit', 'nsfw', 'intercourse', 'futanari', 'hentai', 'ahegao',
+    'faceless', 'hetero', 'yuri', 'erect', 'erection', 'foreskin', 'testicles', 'testicle',
+    'scrotum', 'shaft', 'glans', 'asshole', 'butthole', 'buttplug', 'plugs', 'riding', 'spreading',
+    'inserting', 'insertion', 'groping', 'dripping', 'soaked', 'afterglow', 'lactation',
+    'impregnation', 'bukkake', 'gangbang', 'threesome', 'lesbian', 'ecchi', 'yaoi', 'blindfold',
+    'tentacle', 'tentacles', 'rimming', 'titfuck', 'titjob', 'footjob', 'boobjob', 'prone',
+    'obscured', 'kneels', 'climaxing',
   ];
 
   const NOT_A_TARGET = new Set([
@@ -175,7 +232,7 @@
     'kobold', 'drow', 'lamia', 'naga', 'succubus', 'incubus', 'golem', 'flayer', 'kreen', 'scylla', 'sphinx',
   ]);
 
-  const LEXICON = new Set(WORDS.concat(KEEP).map(function (word) { return word.toLowerCase(); }));
+  const LEXICON = new Set(WORDS.concat(KEEP, EXPLICIT).map(function (word) { return word.toLowerCase(); }));
   Object.keys(TYPOS).forEach(function (key) { LEXICON.add(String(TYPOS[key]).toLowerCase()); });
 
   const BY_LETTER = {};
@@ -210,22 +267,16 @@
     const collapsed = lower.replace(/([a-z])\1{2,}/g, '$1');
     if (collapsed !== lower && LEXICON.has(collapsed)) return applyCase(original, collapsed);
     if (lower.length < 4) return original;
-    const maxDist = lower.length >= 8 ? 2 : 1;
     const bucket = BY_LETTER[lower.charAt(0)] || [];
     let best = null;
-    let bestDist = maxDist + 1;
     let ties = 0;
     for (let i = 0; i < bucket.length; i++) {
       const candidate = bucket[i];
-      if (Math.abs(candidate.length - lower.length) > maxDist) continue;
-      const distance = damerau(lower, candidate, maxDist);
-      if (distance < 1 || distance > maxDist) continue;
-      if (distance === 2 && !sharesEdge(lower, candidate)) continue;
-      if (distance < bestDist) {
+      if (!adjacentSwap(lower, candidate)) continue;
+      if (!best) {
         best = candidate;
-        bestDist = distance;
         ties = 1;
-      } else if (distance === bestDist) {
+      } else if (candidate !== best) {
         ties += 1;
       }
     }
@@ -233,8 +284,17 @@
     return applyCase(original, best);
   }
 
-  function sharesEdge(a, b) {
-    return a.slice(0, 2) === b.slice(0, 2) || a.slice(-2) === b.slice(-2);
+  function adjacentSwap(typed, word) {
+    if (typed.length !== word.length) return false;
+    let found = false;
+    for (let i = 0; i < typed.length; i++) {
+      if (typed.charAt(i) === word.charAt(i)) continue;
+      if (found || i >= typed.length - 1) return false;
+      if (typed.charAt(i) !== word.charAt(i + 1) || typed.charAt(i + 1) !== word.charAt(i)) return false;
+      found = true;
+      i += 1;
+    }
+    return found;
   }
 
   function applyCase(original, fixed) {
@@ -243,32 +303,6 @@
       return fixed.charAt(0).toUpperCase() + fixed.slice(1);
     }
     return fixed;
-  }
-
-  function damerau(a, b, max) {
-    const al = a.length;
-    const bl = b.length;
-    if (Math.abs(al - bl) > max) return max + 1;
-    const rows = [];
-    for (let i = 0; i <= al; i++) {
-      rows[i] = [i];
-      for (let j = 1; j <= bl; j++) rows[i][j] = 0;
-    }
-    for (let j = 0; j <= bl; j++) rows[0][j] = j;
-    for (let i = 1; i <= al; i++) {
-      let rowMin = max + 1;
-      for (let j = 1; j <= bl; j++) {
-        const cost = a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1;
-        let value = Math.min(rows[i - 1][j] + 1, rows[i][j - 1] + 1, rows[i - 1][j - 1] + cost);
-        if (i > 1 && j > 1 && a.charAt(i - 1) === b.charAt(j - 2) && a.charAt(i - 2) === b.charAt(j - 1)) {
-          value = Math.min(value, rows[i - 2][j - 2] + 1);
-        }
-        rows[i][j] = value;
-        if (value < rowMin) rowMin = value;
-      }
-      if (rowMin > max) return max + 1;
-    }
-    return rows[al][bl];
   }
 
   return { correctText: correctText };

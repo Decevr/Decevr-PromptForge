@@ -179,6 +179,31 @@ assert(corrected('form') === 'form', 'form stays form');
 });
 assert(corrected('anthro bear') === 'anthro bear', 'anthro bear stays anthro bear, got ' + corrected('anthro bear'));
 assert(corrected('dark elf') === 'dark elf', 'dark elf stays dark elf, got ' + corrected('dark elf'));
+[
+  'cleaning', 'clearing', 'leans', 'moist', 'lies', 'anima', 'hazel', 'helmut', 'overbust', 'beta',
+  'curvy', 'latex', 'grinding', 'moaning', 'striking', 'coming', 'pussy', 'pussies', 'vagina',
+  'vaginal', 'penis', 'clit', 'clitoris', 'dildo', 'vibrator', 'nude', 'anal', 'orgasm',
+  'lingerie', 'panties', 'nipples', 'breasts', 'doggystyle', 'cunnilingus', 'fellatio', 'fucking',
+].forEach((word) => {
+  assert(corrected(word) === word, word + ' stays ' + word + ', got ' + corrected(word));
+});
+assert(corrected('vaginia') === 'vagina', 'vaginia corrects to vagina');
+assert(corrected('pusy') === 'pussy', 'pusy corrects to pussy');
+assert(corrected('masterbation') === 'masturbation', 'masterbation corrects to masturbation');
+assert(corrected('orgasim') === 'orgasm', 'orgasim corrects to orgasm');
+assert(corrected('vibrater') === 'vibrator', 'vibrater corrects to vibrator');
+assert(corrected('peins') === 'penis', 'peins corrects to penis');
+assert(corrected('fuckign') === 'fucking', 'fuckign corrects to fucking');
+assert(corrected('moanign') === 'moaning', 'moanign corrects to moaning');
+assert(corrected('dogystyle') === 'doggystyle', 'dogystyle corrects to doggystyle');
+assert(corrected('cunilingus') === 'cunnilingus', 'cunilingus corrects to cunnilingus');
+assert(corrected('clitorus') === 'clitoris', 'clitorus corrects to clitoris');
+assert(corrected('nippels') === 'nipples', 'nippels corrects to nipples');
+assert(corrected('brests') === 'breasts', 'brests corrects to breasts');
+assert(corrected('lingeri') === 'lingerie', 'lingeri corrects to lingerie');
+assert(corrected('pantys') === 'panties', 'pantys corrects to panties');
+assert(corrected('felatio') === 'fellatio', 'felatio corrects to fellatio');
+assert(corrected('in the style of Helmut Newton') === 'in the style of Helmut Newton', 'Helmut Newton stays unchanged');
 
 assert(messyTags.prompts.length >= 3, 'tag prompt keeps three suggestions');
 assert(/dramatic_lighting/i.test(messyTags.prompts[1]), 'tag suggestion 2 swaps in dramatic lighting');
