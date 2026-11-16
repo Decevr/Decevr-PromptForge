@@ -170,6 +170,10 @@ app.whenReady().then(async () => {
       });
       const maleSceneTags = sceneApi.roll('male', 'danbooru', 0);
       if (!/penis/.test(maleSceneTags) || !/faceless male/.test(maleSceneTags) || !/doggystyle/.test(maleSceneTags)) sceneActsOk = false;
+      const detailedScene = sceneApi.roll('solo', 'natural', 0);
+      const duoScene = sceneApi.roll('female', 'natural', 0);
+      if (!/(?:21|23|24|25|26|27|28|30|32|34|36|38|40|42) year old/.test(detailedScene) || !/adult woman/.test(detailedScene) || !/hair/.test(detailedScene) || !/eyes/.test(detailedScene) || !/skin/.test(detailedScene) || !/breasts/.test(detailedScene) || (detailedScene.match(/,/g) || []).length >= 2) sceneActsOk = false;
+      if (!/different woman/.test(duoScene) || (duoScene.match(/adult woman/g) || []).length < 2 || /his face/.test(duoScene)) sceneActsOk = false;
     }
     JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionNamed, motionMaleFace, motionFemaleClear, motionImage, motionVideo, motionSkipped, motionOther, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle, sceneButtons, sceneActsOk });
   `);
