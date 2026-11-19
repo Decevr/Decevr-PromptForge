@@ -131,10 +131,18 @@
     modal.hidden = true;
     modal.innerHTML = [
       '<div class="character-dialog" role="dialog" aria-labelledby="char-title">',
-      '<div class="character-head"><h2 id="char-title">Character Templates</h2>',
+      '<div class="character-head"><h2 id="char-title">Characters</h2>',
       '<button type="button" class="text-btn" id="char-close">Close</button></div>',
-      '<div class="character-body">',
-      '<div class="character-list" id="character-list"></div>',
+      '<div class="character-body character-with-catalog">',
+      '<div class="chtx-pane">',
+      '<h3>CHTX</h3>',
+      '<p class="hint">Catalog characters, in addition to the ones you save.</p>',
+      '<input id="chtx-search" type="search" placeholder="Search a character or series" />',
+      '<select id="chtx-category" aria-label="CHTX category"></select>',
+      '<p class="hint" id="chtx-count"></p>',
+      '<div id="chtx-list"></div>',
+      '</div>',
+      '<div class="character-list saved-pane"><h3>Your characters</h3><div id="character-list"></div></div>',
       '<form class="character-form" id="character-form">',
       '<div class="character-random">',
       '<h3>Random character</h3>',
@@ -202,6 +210,73 @@
       listEl.innerHTML = chars.map(function (char) {
         return '<article class="history-card"><div class="row"><strong>' + escapeHtml(char.name || 'Unnamed') + '</strong></div><div class="row" style="margin-top:8px"><button type="button" class="load-btn" data-insert="' + escapeHtml(char.id) + '">Insert</button><button type="button" class="load-btn" data-edit="' + escapeHtml(char.id) + '">Edit</button><button type="button" class="load-btn" data-delete="' + escapeHtml(char.id) + '">Delete</button></div></article>';
       }).join('');
+    }
+
+    function catalogRows() {
+      return (window.PF_CHTX && window.PF_CHTX.characters) || [];
+    }
+
+    function catalogText(row, format) {
+      if (format === 'danbooru') return row.booru || '';
+      if (format === 'gelbooru') {
+        return String(row.booru || '').split(',').map(function (tag) {
+          return tag.trim().replace(/_/g, ' ');
+        }).filter(Boolean).join(', ');
+      }
+      return ((row.name || '').trim() + ' from ' + (row.series || '').trim()).replace(/[.\s]*$/, '') + '.';
+    }
+
+    function renderCatalog() {
+      const host = document.getElementById('chtx-list');
+      const countEl = document.getElementById('chtx-count');
+      const search = document.getElementById('chtx-search');
+      const category = document.getElementById('chtx-category');
+      if (!host || !countEl) return;
+      const rows = catalogRows();
+      if (!rows.length) {
+        host.innerHTML = '<p class="empty">CHTX catalog is not loaded.</p>';
+        countEl.textContent = '';
+        return;
+      }
+      const needle = (search && search.value || '').trim().toLowerCase();
+      const cat = category ? category.value : '';
+      const matches = [];
+      rows.forEach(function (row, index) {
+        if (cat && row.category !== cat) return;
+        if (needle && row.name.toLowerCase().indexOf(needle) === -1 && row.series.toLowerCase().indexOf(needle) === -1) return;
+        matches.push(index);
+      });
+      const shown = matches.slice(0, 80);
+      if (!shown.length) {
+        host.innerHTML = '<p class="empty">No matches.</p>';
+      } else {
+        host.innerHTML = shown.map(function (index) {
+          const row = rows[index];
+          return '<article class="history-card"><div class="row"><strong>' + escapeHtml(row.name) + '</strong></div><div class="row chtx-series">' + escapeHtml(row.series) + '</div><div class="row" style="margin-top:8px"><button type="button" class="load-btn" data-chtx="' + index + '">Insert</button></div></article>';
+        }).join('');
+      }
+      if (shown.length < matches.length) countEl.textContent = 'Showing ' + shown.length + ' of ' + matches.length;
+      else countEl.textContent = matches.length + (matches.length === 1 ? ' character' : ' characters');
+    }
+
+    function insertCatalog(index) {
+      const row = catalogRows()[index];
+      const input = document.getElementById('prompt-input');
+      if (!row || !input) return;
+      const desc = catalogText(row, activeFormat());
+      if (!desc) return;
+      const id = 'chtx:' + index;
+      const already = selected.some(function (item) { return item.id === id; });
+      if (!already) {
+        const current = input.value.trim();
+        const snippet = desc.replace(/[.\s]*$/, '');
+        input.value = current ? snippet + ', ' + current : desc;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        selected.push({ id: id, name: row.name + ' · ' + row.series, snippet: snippet });
+        renderSelected();
+      }
+      input.focus();
+      modal.hidden = true;
     }
 
     function pickOne(list) {
@@ -351,6 +426,24 @@
       fillForm(null);
     });
 
+    const chtxCategory = document.getElementById('chtx-category');
+    if (chtxCategory && window.PF_CHTX && window.PF_CHTX.categories) {
+      chtxCategory.innerHTML = '<option value="">All categories</option>' + window.PF_CHTX.categories.map(function (item) {
+        return '<option value="' + escapeHtml(item.id) + '">' + escapeHtml(item.label) + ' (' + item.count + ')</option>';
+      }).join('');
+    }
+    const chtxSearch = document.getElementById('chtx-search');
+    if (chtxSearch) chtxSearch.addEventListener('input', renderCatalog);
+    if (chtxCategory) chtxCategory.addEventListener('change', renderCatalog);
+    const chtxList = document.getElementById('chtx-list');
+    if (chtxList) {
+      chtxList.addEventListener('click', function (event) {
+        const button = event.target.closest('[data-chtx]');
+        if (!button) return;
+        insertCatalog(Number(button.getAttribute('data-chtx')));
+      });
+    }
+
     document.getElementById('char-new').addEventListener('click', function () { fillForm(null); });
     document.getElementById('char-random-female').addEventListener('click', function () { saveRandom('female'); });
     document.getElementById('char-random-male').addEventListener('click', function () { saveRandom('male'); });
@@ -372,6 +465,7 @@
 
     function open() {
       renderList();
+      renderCatalog();
       modal.hidden = false;
     }
 
@@ -387,6 +481,7 @@
     window.PromptForgeUI = window.PromptForgeUI || {};
     window.PromptForgeUI.openCharacters = open;
     renderList();
+    renderCatalog();
     renderSelected();
   }
 
