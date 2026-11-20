@@ -217,13 +217,25 @@
     }
 
     function catalogText(row, format) {
-      if (format === 'danbooru') return row.booru || '';
-      if (format === 'gelbooru') {
-        return String(row.booru || '').split(',').map(function (tag) {
-          return tag.trim().replace(/_/g, ' ');
-        }).filter(Boolean).join(', ');
+      const look = String(row.look || '').replace(/[.\s]*$/, '').trim();
+      const extra = String(row.tags || '').split(',').map(function (tag) {
+        return tag.trim();
+      }).filter(Boolean);
+      if (format === 'danbooru' || format === 'gelbooru') {
+        const tags = String(row.booru || '').split(',').map(function (tag) {
+          return tag.trim();
+        }).filter(Boolean);
+        extra.forEach(function (tag) {
+          if (tags.indexOf(tag) === -1) tags.push(tag);
+        });
+        if (format === 'gelbooru') {
+          return tags.map(function (tag) { return tag.replace(/_/g, ' '); }).join(', ');
+        }
+        return tags.join(', ');
       }
-      return ((row.name || '').trim() + ' from ' + (row.series || '').trim()).replace(/[.\s]*$/, '') + '.';
+      const who = ((row.name || '').trim() + ' from ' + (row.series || '').trim()).replace(/[.\s]*$/, '');
+      if (!look) return who + '.';
+      return who + ', ' + look + '.';
     }
 
     function renderCatalog() {
@@ -252,7 +264,8 @@
       } else {
         host.innerHTML = shown.map(function (index) {
           const row = rows[index];
-          return '<article class="history-card"><div class="row"><strong>' + escapeHtml(row.name) + '</strong></div><div class="row chtx-series">' + escapeHtml(row.series) + '</div><div class="row" style="margin-top:8px"><button type="button" class="load-btn" data-chtx="' + index + '">Insert</button></div></article>';
+          const look = row.look ? '<div class="row chtx-look">' + escapeHtml(row.look) + '</div>' : '';
+          return '<article class="history-card"><div class="row"><strong>' + escapeHtml(row.name) + '</strong></div><div class="row chtx-series">' + escapeHtml(row.series) + '</div>' + look + '<div class="row" style="margin-top:8px"><button type="button" class="load-btn" data-chtx="' + index + '">Insert</button></div></article>';
         }).join('');
       }
       if (shown.length < matches.length) countEl.textContent = 'Showing ' + shown.length + ' of ' + matches.length;

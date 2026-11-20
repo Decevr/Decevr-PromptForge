@@ -223,9 +223,12 @@ app.whenReady().then(async () => {
   if (parsed.chtxCount < 823) problems.push('chtx catalog: ' + parsed.chtxCount);
   if (!parsed.chtxSavedHeading) problems.push('saved characters heading missing');
   if (parsed.chtxVisible < 1) problems.push('chtx search showed no Usagi');
-  if (!/Usagi Tsukino from Sailor Moon/.test(parsed.chtxNatural)) problems.push('chtx natural: ' + parsed.chtxNatural);
+  if (!/Usagi Tsukino from Sailor Moon, long blonde hair/.test(parsed.chtxNatural)) problems.push('chtx natural: ' + parsed.chtxNatural);
+  if (!/blue eyes/.test(parsed.chtxNatural) || !/sailor senshi uniform/.test(parsed.chtxNatural)) problems.push('chtx look: ' + parsed.chtxNatural);
   if (!/tsukino_usagi, bishoujo_senshi_sailor_moon/.test(parsed.chtxTags)) problems.push('chtx tags: ' + parsed.chtxTags);
+  if (!/blonde_hair/.test(parsed.chtxTags) || !/blue_eyes/.test(parsed.chtxTags)) problems.push('chtx look tags: ' + parsed.chtxTags);
   if (!/tsukino usagi, bishoujo senshi sailor moon/.test(parsed.chtxGel)) problems.push('chtx gelbooru: ' + parsed.chtxGel);
+  if (!/blonde hair/.test(parsed.chtxGel) || !/blue eyes/.test(parsed.chtxGel)) problems.push('chtx gel look: ' + parsed.chtxGel);
   if (!parsed.charFields) problems.push('character body and mark fields missing');
   if (!parsed.marksHeading) problems.push('marks section missing');
   if (!parsed.raceIsInput) problems.push('race is not a text field');
