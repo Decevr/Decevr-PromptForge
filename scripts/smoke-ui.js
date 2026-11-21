@@ -1,7 +1,11 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const { registerChtxScheme, installChtxProtocol } = require('../electron/chtx-portraits');
+
+registerChtxScheme();
 
 app.whenReady().then(async () => {
+  installChtxProtocol();
   const win = new BrowserWindow({
     show: false,
     webPreferences: {
@@ -203,6 +207,30 @@ app.whenReady().then(async () => {
     JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, chtxCount, chtxSavedHeading, chtxVisible, chtxNatural, chtxTags, chtxGel, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionNamed, motionMaleFace, motionFemaleClear, motionImage, motionVideo, motionSkipped, motionOther, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle, sceneButtons, sceneActsOk });
   `);
   const parsed = JSON.parse(report);
+  const catalog = await win.webContents.executeJavaScript(`(async () => {
+    document.getElementById('characters-open').click();
+    const search = document.getElementById('chtx-search');
+    function show(value) {
+      search.value = value;
+      search.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    show('Jessie');
+    const jessie = [...document.querySelectorAll('#chtx-list article')].slice(0, 2).map((card) => card.innerText);
+    show('Sophie Hatter');
+    const sophieNode = document.querySelector('#chtx-list .chtx-missing');
+    const sophie = sophieNode ? sophieNode.textContent : '';
+    show('Usagi Tsukino');
+    const img = document.querySelector('#chtx-list .chtx-portrait');
+    const src = img ? img.getAttribute('src') : '';
+    const loaded = await new Promise((resolve) => {
+      if (!img || img.tagName !== 'IMG') return resolve(false);
+      if (img.complete && img.naturalWidth > 0) return resolve(true);
+      img.addEventListener('load', () => resolve(img.naturalWidth > 0), { once: true });
+      img.addEventListener('error', () => resolve(false), { once: true });
+    });
+    document.getElementById('char-close').click();
+    return { jessie, sophie, src, loaded };
+  })()`);
   const problems = [];
   if (errors.length) problems.push('console: ' + errors.join(' | '));
   if (!parsed.text.includes('sparkling_eyes')) problems.push('missing danbooru prompt: ' + parsed.text);
@@ -223,7 +251,11 @@ app.whenReady().then(async () => {
   if (parsed.chtxCount < 823) problems.push('chtx catalog: ' + parsed.chtxCount);
   if (!parsed.chtxSavedHeading) problems.push('saved characters heading missing');
   if (parsed.chtxVisible < 1) problems.push('chtx search showed no Usagi');
-  if (!/Usagi Tsukino from Sailor Moon, long blonde hair/.test(parsed.chtxNatural)) problems.push('chtx natural: ' + parsed.chtxNatural);
+  if (catalog.jessie.length < 2 || !catalog.jessie.some((text) => text.includes('Pixar')) || !catalog.jessie.some((text) => text.includes('Pokemon'))) problems.push('jessie order: ' + catalog.jessie.join(' / '));
+  if (catalog.sophie !== 'Name and series only') problems.push('empty look: ' + catalog.sophie);
+  if (!String(catalog.src || '').startsWith('chtx://portrait/images/')) problems.push('portrait src: ' + catalog.src);
+  if (!catalog.loaded) problems.push('portrait did not load');
+  if (!/Usagi Tsukino from Sailor Moon, with long blonde hair/.test(parsed.chtxNatural)) problems.push('chtx natural: ' + parsed.chtxNatural);
   if (!/blue eyes/.test(parsed.chtxNatural) || !/sailor senshi uniform/.test(parsed.chtxNatural)) problems.push('chtx look: ' + parsed.chtxNatural);
   if (!/tsukino_usagi, bishoujo_senshi_sailor_moon/.test(parsed.chtxTags)) problems.push('chtx tags: ' + parsed.chtxTags);
   if (!/blonde_hair/.test(parsed.chtxTags) || !/blue_eyes/.test(parsed.chtxTags)) problems.push('chtx look tags: ' + parsed.chtxTags);

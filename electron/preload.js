@@ -6,4 +6,9 @@ contextBridge.exposeInMainWorld('promptforge', {
     clipboard.writeText(String(text ?? ''));
     return true;
   },
+  chtxPortrait(rel) {
+    const clean = String(rel || '').replace(/\\/g, '/').replace(/^\/+/, '');
+    if (!clean.startsWith('images/') || clean.includes('..')) return '';
+    return 'chtx://portrait/' + clean.split('/').map(encodeURIComponent).join('/');
+  },
 });

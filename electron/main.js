@@ -1,5 +1,8 @@
 const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
+const { registerChtxScheme, installChtxProtocol } = require('./chtx-portraits');
+
+registerChtxScheme();
 
 // The visible title can change. Saved characters and history stay in this folder.
 app.setPath('userData', path.join(app.getPath('appData'), 'PromptForge'));
@@ -17,7 +20,10 @@ if (!gotLock) {
     mainWindow.focus();
   });
 
-  app.whenReady().then(createWindow);
+  app.whenReady().then(() => {
+    installChtxProtocol();
+    createWindow();
+  });
 
   app.on('window-all-closed', () => {
     app.quit();

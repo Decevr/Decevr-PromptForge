@@ -867,8 +867,20 @@ h2 {
   color: inherit;
 }
 
+.chtx-card { display: flex; gap: 10px; align-items: flex-start; }
+.chtx-card-body { min-width: 0; flex: 1; }
+.chtx-portrait {
+  width: 54px;
+  height: 72px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 6px;
+  background: var(--sunken);
+  flex: none;
+}
 .chtx-series { color: var(--muted); font-size: 12px; margin-top: 2px; }
 .chtx-look { color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 4px; }
+.chtx-missing { font-style: italic; }
 
 .saved-pane h3 { margin-bottom: 10px; }
 .character-split .pane + .pane { border-left: 1px solid var(--line); }

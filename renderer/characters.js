@@ -136,7 +136,7 @@
       '<div class="character-body character-with-catalog">',
       '<div class="chtx-pane">',
       '<h3>CHTX</h3>',
-      '<p class="hint">Catalog characters, in addition to the ones you save.</p>',
+      '<p class="hint">Exact names come first. A card with no look inserts the name and series only.</p>',
       '<input id="chtx-search" type="search" placeholder="Search a character or series" />',
       '<select id="chtx-category" aria-label="CHTX category"></select>',
       '<p class="hint" id="chtx-count"></p>',
@@ -235,7 +235,31 @@
       }
       const who = ((row.name || '').trim() + ' from ' + (row.series || '').trim()).replace(/[.\s]*$/, '');
       if (!look) return who + '.';
-      return who + ', ' + look + '.';
+      if (look.indexOf('. ') !== -1) {
+        return who + '. ' + look.charAt(0).toUpperCase() + look.slice(1) + '.';
+      }
+      const wearingAt = look.toLowerCase().indexOf(', wearing ');
+      if (wearingAt !== -1) {
+        return who + ', with ' + look.slice(0, wearingAt) + ', wearing ' + look.slice(wearingAt + ', wearing '.length) + '.';
+      }
+      return who + ', with ' + look + '.';
+    }
+
+    function matchRank(row, needle) {
+      if (!needle) return 0;
+      const name = String(row.name || '').toLowerCase();
+      const series = String(row.series || '').toLowerCase();
+      if (name === needle) return 0;
+      if (name.indexOf(needle) === 0) return 1;
+      if (name.indexOf(needle) !== -1) return 2;
+      if (series.indexOf(needle) === 0) return 3;
+      if (series.indexOf(needle) !== -1) return 4;
+      return 9;
+    }
+
+    function portraitUrl(row) {
+      if (!row.image || !window.promptforge || !promptforge.chtxPortrait) return '';
+      return promptforge.chtxPortrait(row.image);
     }
 
     function renderCatalog() {
@@ -255,8 +279,11 @@
       const matches = [];
       rows.forEach(function (row, index) {
         if (cat && row.category !== cat) return;
-        if (needle && row.name.toLowerCase().indexOf(needle) === -1 && row.series.toLowerCase().indexOf(needle) === -1) return;
+        if (matchRank(row, needle) === 9) return;
         matches.push(index);
+      });
+      matches.sort(function (a, b) {
+        return matchRank(rows[a], needle) - matchRank(rows[b], needle) || a - b;
       });
       const shown = matches.slice(0, 80);
       if (!shown.length) {
@@ -264,8 +291,14 @@
       } else {
         host.innerHTML = shown.map(function (index) {
           const row = rows[index];
-          const look = row.look ? '<div class="row chtx-look">' + escapeHtml(row.look) + '</div>' : '';
-          return '<article class="history-card"><div class="row"><strong>' + escapeHtml(row.name) + '</strong></div><div class="row chtx-series">' + escapeHtml(row.series) + '</div>' + look + '<div class="row" style="margin-top:8px"><button type="button" class="load-btn" data-chtx="' + index + '">Insert</button></div></article>';
+          const url = portraitUrl(row);
+          const photo = url
+            ? '<img class="chtx-portrait" alt="" src="' + escapeHtml(url) + '">'
+            : '<span class="chtx-portrait chtx-portrait-empty"></span>';
+          const look = row.look
+            ? '<div class="chtx-look">' + escapeHtml(row.look) + '</div>'
+            : '<div class="chtx-look chtx-missing">Name and series only</div>';
+          return '<article class="history-card chtx-card">' + photo + '<div class="chtx-card-body"><div class="row"><strong>' + escapeHtml(row.name) + '</strong></div><div class="chtx-series">' + escapeHtml(row.series) + '</div>' + look + '<div class="row"><button type="button" class="load-btn" data-chtx="' + index + '">Insert</button></div></div></article>';
         }).join('');
       }
       if (shown.length < matches.length) countEl.textContent = 'Showing ' + shown.length + ' of ' + matches.length;
