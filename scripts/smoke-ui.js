@@ -61,9 +61,14 @@ app.whenReady().then(async () => {
     document.getElementById('chtx-search').value = 'Usagi Tsukino';
     document.getElementById('chtx-search').dispatchEvent(new Event('input', { bubbles: true }));
     const chtxVisible = document.querySelectorAll('#chtx-list [data-chtx]').length;
+    const negBefore = (() => { try { return (JSON.parse(localStorage.getItem('promptforge.v1') || '{}') || {}).negativeExtra || ''; } catch (error) { return ''; } })();
     document.querySelector('#chtx-list [data-chtx]')?.click();
     const chtxNatural = document.getElementById('prompt-input').value;
+    const chtxNegOn = document.getElementById('negative-toggle').checked === true;
+    const chtxNegative = (() => { try { return (JSON.parse(localStorage.getItem('promptforge.v1') || '{}') || {}).negativeExtra || ''; } catch (error) { return ''; } })();
     document.querySelector('#selected-character-list [data-remove-char]')?.click();
+    const chtxNegAfter = (() => { try { return (JSON.parse(localStorage.getItem('promptforge.v1') || '{}') || {}).negativeExtra || ''; } catch (error) { return ''; } })();
+    const chtxNegRestored = chtxNegAfter === negBefore;
     document.getElementById('format-select').value = 'danbooru';
     document.getElementById('characters-open').click();
     document.getElementById('chtx-search').value = 'Usagi Tsukino';
@@ -204,7 +209,7 @@ app.whenReady().then(async () => {
       if (!/(?:21|23|24|25|26|27|28|30|32|34|36|38|40|42) year old/.test(detailedScene) || !/adult woman/.test(detailedScene) || !/hair/.test(detailedScene) || !/eyes/.test(detailedScene) || !/skin/.test(detailedScene) || !/breasts/.test(detailedScene) || (detailedScene.match(/,/g) || []).length >= 2) sceneActsOk = false;
       if (!/different woman/.test(duoScene) || (duoScene.match(/adult woman/g) || []).length < 2 || /his face/.test(duoScene)) sceneActsOk = false;
     }
-    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, chtxCount, chtxSavedHeading, chtxVisible, chtxNatural, chtxTags, chtxGel, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionNamed, motionMaleFace, motionFemaleClear, motionImage, motionVideo, motionSkipped, motionOther, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle, sceneButtons, sceneActsOk });
+    JSON.stringify({ text, copyButtons, label, settings, cards: document.querySelectorAll('.card').length, title, decevr, windowTitle, credit, spellMisses, spellHint, charOpen, charClosed, charFields, marksHeading, raceIsInput, raceFantasy, raceFurry, raceTyped, chtxCount, chtxSavedHeading, chtxVisible, chtxNatural, chtxNegOn, chtxNegative, chtxNegAfter, chtxNegRestored, chtxTags, chtxGel, negative, tools, selectedText, angleCount, lensCount, stealthCount, stealthLabel, hintMoved, extraCount, extraOnFront, extraHidden, extraOpen, extraClosed, artistCount, comicCount, hairChoices, lingerieChoices, hairAdded, hairSkipped, artistAdded, artistSkipped, artistNatural, motionNamed, motionMaleFace, motionFemaleClear, motionImage, motionVideo, motionSkipped, motionOther, sceneMale, sceneFemale, maleFace, femaleFace, doggyLabel, sceneDoggy, sceneDoggyTags, penetrativeMale, clothingInputs, clothingPainted, clothingTags, clothingPartial, clothingNude, lingeriePainted, lingerieNamed, satinTeddy, clothingApron, clothingShirt, clothingIdle, sceneButtons, sceneActsOk });
   `);
   const parsed = JSON.parse(report);
   const catalog = await win.webContents.executeJavaScript(`(async () => {
@@ -257,6 +262,8 @@ app.whenReady().then(async () => {
   if (!catalog.loaded) problems.push('portrait did not load');
   if (!/Usagi Tsukino from Sailor Moon, with long blonde hair/.test(parsed.chtxNatural)) problems.push('chtx natural: ' + parsed.chtxNatural);
   if (!/blue eyes/.test(parsed.chtxNatural) || !/sailor senshi uniform/.test(parsed.chtxNatural)) problems.push('chtx look: ' + parsed.chtxNatural);
+  if (!parsed.chtxNegOn || !/different character/.test(parsed.chtxNegative) || !/wrong series/.test(parsed.chtxNegative) || !/blurry eyes/.test(parsed.chtxNegative) || !/young girl/.test(parsed.chtxNegative) || !/nsfw/.test(parsed.chtxNegative)) problems.push('chtx negative: ' + parsed.chtxNegative);
+  if (!parsed.chtxNegRestored) problems.push('character negative was left behind: ' + parsed.chtxNegAfter);
   if (!/tsukino_usagi, bishoujo_senshi_sailor_moon/.test(parsed.chtxTags)) problems.push('chtx tags: ' + parsed.chtxTags);
   if (!/blonde_hair/.test(parsed.chtxTags) || !/blue_eyes/.test(parsed.chtxTags)) problems.push('chtx look tags: ' + parsed.chtxTags);
   if (!/tsukino usagi, bishoujo senshi sailor moon/.test(parsed.chtxGel)) problems.push('chtx gelbooru: ' + parsed.chtxGel);

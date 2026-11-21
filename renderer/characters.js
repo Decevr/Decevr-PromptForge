@@ -199,6 +199,11 @@
       }
       selected.splice(index, 1);
       renderSelected();
+      if (item.negative && !selected.some(function (other) { return other.negative; })) {
+        document.dispatchEvent(new CustomEvent('promptforge:negative', {
+          detail: { tags: item.negative, remove: true },
+        }));
+      }
     }
 
     function renderList() {
@@ -305,11 +310,22 @@
       else countEl.textContent = matches.length + (matches.length === 1 ? ' character' : ' characters');
     }
 
+    function characterNegative(format) {
+      const words = [
+        'different character', 'wrong series', 'generic face', 'extra people', 'blurry eyes',
+        'nude', 'naked', 'nsfw', 'explicit', 'nipples', 'pussy', 'lingerie', 'suggestive', 'porn',
+        'child', 'loli', 'underage', 'teen', 'young girl', 'little girl', 'schoolgirl',
+      ];
+      if (format === 'danbooru') return words.map(function (word) { return word.replace(/ /g, '_'); }).join(', ');
+      return words.join(', ');
+    }
+
     function insertCatalog(index) {
       const row = catalogRows()[index];
       const input = document.getElementById('prompt-input');
       if (!row || !input) return;
-      const desc = catalogText(row, activeFormat());
+      const format = activeFormat();
+      const desc = catalogText(row, format);
       if (!desc) return;
       const id = 'chtx:' + index;
       const already = selected.some(function (item) { return item.id === id; });
@@ -318,8 +334,11 @@
         const snippet = desc.replace(/[.\s]*$/, '');
         input.value = current ? snippet + ', ' + current : desc;
         input.dispatchEvent(new Event('input', { bubbles: true }));
-        selected.push({ id: id, name: row.name + ' · ' + row.series, snippet: snippet });
+        selected.push({ id: id, name: row.name + ' · ' + row.series, snippet: snippet, negative: characterNegative(format) });
         renderSelected();
+        document.dispatchEvent(new CustomEvent('promptforge:negative', {
+          detail: { tags: characterNegative(format), append: true },
+        }));
       }
       input.focus();
       modal.hidden = true;

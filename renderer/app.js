@@ -121,11 +121,68 @@
     }
   });
 
+  function negativeParts(text) {
+    return String(text || '').split(',').map(function (part) { return part.trim(); }).filter(Boolean);
+  }
+
+  function negativeKey(tag) {
+    return tag.toLowerCase().replace(/_/g, ' ');
+  }
+
+  function mergeNegativeText(base, extra) {
+    const seen = {};
+    const parts = [];
+    negativeParts(base).concat(negativeParts(extra)).forEach(function (tag) {
+      const key = negativeKey(tag);
+      if (seen[key]) return;
+      seen[key] = true;
+      parts.push(tag);
+    });
+    return parts.join(', ');
+  }
+
+  function removeNegativeText(base, extra) {
+    const drop = {};
+    negativeParts(extra).forEach(function (tag) { drop[negativeKey(tag)] = true; });
+    return negativeParts(base).filter(function (tag) { return !drop[negativeKey(tag)]; }).join(', ');
+  }
+
   document.addEventListener('promptforge:negative', function (event) {
-    state.negativeExtra = (event.detail && event.detail.tags) || '';
+    const detail = event.detail || {};
+    const tags = detail.tags || '';
+    if (detail.append) {
+      if (!state.chtxNegativeHeld) {
+        state.chtxNegativeSnapshot = state.negativeExtra;
+        state.chtxNegativeWasOn = state.includeNegative;
+      }
+      state.chtxNegativeHeld = true;
+      state.negativeExtra = mergeNegativeText(state.negativeExtra, tags);
+    } else if (detail.remove) {
+      const wasOn = state.chtxNegativeWasOn;
+      if (state.chtxNegativeHeld) state.negativeExtra = state.chtxNegativeSnapshot || '';
+      else state.negativeExtra = removeNegativeText(state.negativeExtra, tags);
+      state.chtxNegativeHeld = false;
+      state.chtxNegativeSnapshot = null;
+      state.chtxNegativeWasOn = false;
+      if (!state.negativeExtra) {
+        state.includeNegative = Boolean(wasOn);
+        els.negative.checked = state.includeNegative;
+      }
+    } else {
+      state.negativeExtra = tags;
+      if (state.chtxNegativeHeld) {
+        state.chtxNegativeSnapshot = state.negativeExtra;
+        state.chtxNegativeWasOn = true;
+      }
+    }
     if (state.negativeExtra) {
       state.includeNegative = true;
       els.negative.checked = true;
+    }
+    if (state.results && state.results.length) {
+      const model = currentModel();
+      state.negative = state.includeNegative ? mergeNegativeText(model && model.negativeTemplate, state.negativeExtra) : '';
+      renderResults();
     }
     saveStore();
   });
